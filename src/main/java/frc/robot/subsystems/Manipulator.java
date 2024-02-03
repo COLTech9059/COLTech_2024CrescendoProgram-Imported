@@ -229,10 +229,10 @@ public class Manipulator {
         //#AMPSCORE
         //This method will score in the amp manually
         public void ampScore() {
-            if (IO.dController.getBButton()) {
+            if (IO.dController.getBButtonPressed()) {
                 rightIntakeMotor.set(0.4);
                 ampMotor.set(0.3);
-            } else {
+            } else if (IO.dController.getBButtonReleased()) {
                 rightIntakeMotor.set(0);
                 ampMotor.set(0);
             }
@@ -259,14 +259,26 @@ public class Manipulator {
 
         //#MOVEMANIPULATOR
         //This method will move the manipulator forward by a set time
-        public void moveManipulator(double moveTime) {
-            
+        public void moveManipulator(double moveTime, boolean isNegative) {
+            if (!isNegative) {
             Timer moveTimer = new Timer();
+            moveTimer.reset();
+            moveTimer.start();
             if (moveTimer.get() <= moveTime) {
                 rightBaseMotor.set(0.3);
             } else {
                 rightBaseMotor.set(0);
             }
+        } else {
+                Timer moveTimer2 = new Timer();
+                moveTimer2.reset();
+                moveTimer2.start();
+            if (moveTimer2.get() <= moveTime) {
+                rightBaseMotor.set(-0.3);
+            } else {
+                rightBaseMotor.set(0);
+            }
+        }
         }
 
 
@@ -278,6 +290,7 @@ public class Manipulator {
         if (usingDigitalSensors) {
             if (IO.dController.getLeftTriggerAxis() > 0.4) intake(4);
             if (IO.dController.getRightBumper()) moveManipulator(false);
+            if (IO.dController.getLeftBumper()) moveManipulator(true);
             if (IO.dController.getYButton()) ampPosition(5);
             if (IO.dController.getXButton()) shootPosition(4);
             if (IO.dController.getBButton()) ampScore(4);
@@ -297,7 +310,7 @@ public class Manipulator {
         //This method will do all of the actions for our manipulator during auto
         public void autoManipulator(boolean doesIntake, boolean doesAim, boolean doesShoot, boolean doesAmp) {
             if (doesIntake) {
-                moveManipulator(1.5);
+                moveManipulator(1.5, false);
                 intake(4);
             }
             if (doesAim) ampPosition(5);

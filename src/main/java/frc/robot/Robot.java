@@ -111,7 +111,7 @@ public class Robot extends TimedRobot {
     DriveTrain.drive();
 
     manipulator.controlManipulator();
-    while (IO.dController.getRightBumper()) limelight.activateLimelight();
+    while (IO.dController.getAButton()) limelight.activateLimelight();
 
   }
 
