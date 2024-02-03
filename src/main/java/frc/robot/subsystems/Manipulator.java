@@ -16,15 +16,15 @@ public class Manipulator {
     CANSparkMax leftBaseMotor = new CANSparkMax(Constants.leftBaseID, MotorType.kBrushed);
     CANSparkMax rightBaseMotor = new CANSparkMax(Constants.rightBaseID, MotorType.kBrushed);
     CANSparkMax ampMotor = new CANSparkMax(Constants.ampID, MotorType.kBrushless);
-    static CANSparkMax rightIntakeMotor = new CANSparkMax(Constants.rightIntakeID, MotorType.kBrushless);
-    CANSparkMax leftIntakeMotor = new CANSparkMax(Constants.leftIntakeID, MotorType.kBrushless);
+    static CANSparkMax intakeMotor = new CANSparkMax(Constants.rightIntakeID, MotorType.kBrushless);
+    CANSparkMax followerAmpMotor = new CANSparkMax(Constants.leftIntakeID, MotorType.kBrushless);
 
     //Create the encoder objects
     RelativeEncoder leftBaseEncoder = leftBaseMotor.getEncoder();
     RelativeEncoder rightBaseEncoder = rightBaseMotor.getEncoder();
     RelativeEncoder ampEncoder = ampMotor.getEncoder();
-    RelativeEncoder rightIntakeEncoder = rightIntakeMotor.getEncoder();
-    RelativeEncoder leftIntakeEncoder= leftIntakeMotor.getEncoder();
+    RelativeEncoder leftIntakeEncoder= followerAmpMotor.getEncoder();
+    RelativeEncoder rightIntakeEncoder = intakeMotor.getEncoder();
 
     //Create the digital input objects
     static DigitalInput beamSensor = new DigitalInput(Constants.beamSensorID);
@@ -46,12 +46,12 @@ public class Manipulator {
         leftBaseMotor.restoreFactoryDefaults();
         rightBaseMotor.restoreFactoryDefaults();
         ampMotor.restoreFactoryDefaults();
-        rightIntakeMotor.restoreFactoryDefaults();
-        leftIntakeMotor.restoreFactoryDefaults();
+        followerAmpMotor.restoreFactoryDefaults();
+        intakeMotor.restoreFactoryDefaults();
 
         //Set the leftIntakeMotor as a follower
-        leftIntakeMotor.follow(rightIntakeMotor);
-        leftIntakeMotor.setInverted(true);
+        followerAmpMotor.follow(ampMotor);
+        followerAmpMotor.setInverted(true);
 
         //Set the leftBaseMotor as a follower
         leftBaseMotor.follow(rightBaseMotor);
@@ -138,13 +138,13 @@ public class Manipulator {
             intakeTime.start();
         if (intakeTime.get() <= timeout) {
             if (!beamSensor.get()) {
-                rightIntakeMotor.set(0.4);
+                intakeMotor.set(0.4);
             } else {
-                rightIntakeMotor.set(0);
+                intakeMotor.set(0);
                 didIntake = true;
             }
         } else {
-            rightIntakeMotor.set(0);
+            intakeMotor.set(0);
             didIntake = false;
         }
         }
@@ -152,7 +152,7 @@ public class Manipulator {
         //#INTAKE
         //This method will manually intake a note
         public void intake() {
-            if (IO.dController.getLeftTriggerAxis() > 0.4) {rightIntakeMotor.set(0.4);} else {rightIntakeMotor.set(0);} 
+            if (IO.dController.getLeftTriggerAxis() > 0.4) {intakeMotor.set(0.4);} else {intakeMotor.set(0);} 
         }
 
 
@@ -172,10 +172,10 @@ public class Manipulator {
             //If the beam sensor is active, the intake motor runs in reverse until the beam sensor is deactivated,
             // at which point the intake motor will stop and the amp motor will run for 1 second at full power to shoot
             if (beamSensor.get()) {
-                rightIntakeMotor.set(0.4);
+                intakeMotor.set(0.4);
             } else if (!beamSensor.get()) {
                 shootTime.start();
-                rightIntakeMotor.set(0);
+                intakeMotor.set(0);
                 ampMotor.set(1);
             } 
             if (!beamSensor.get() && shootTime.get() >= 1) {
@@ -189,10 +189,10 @@ public class Manipulator {
         //This method will shoot a note manually
         public void shootNote() {
             if (IO.dController.getRightTriggerAxis() > 0.4) {
-                rightIntakeMotor.set(0.4);
+                intakeMotor.set(0.4);
                 ampMotor.set(1);
             } else {
-                rightIntakeMotor.set(0);
+                intakeMotor.set(0);
                 ampMotor.set(0);
             }
         }
@@ -213,10 +213,10 @@ public class Manipulator {
             //If the beam sensor is active, the intake motor runs in reverse until the beam sensor is deactivated,
             // at which point the intake motor will stop and the amp motor will run for 1.5 seconds at 40% power to score
             if (beamSensor.get()) {
-                rightIntakeMotor.set(0.4);
+                intakeMotor.set(0.4);
             } else if (!beamSensor.get()) {
                 ampTime.start();
-                rightIntakeMotor.set(0);
+                intakeMotor.set(0);
                 ampMotor.set(0.3);
             } 
             if (!beamSensor.get() && ampTime.get() >= 1.5) {
@@ -229,11 +229,11 @@ public class Manipulator {
         //#AMPSCORE
         //This method will score in the amp manually
         public void ampScore() {
-            if (IO.dController.getBButtonPressed()) {
-                rightIntakeMotor.set(0.4);
+            if (IO.dController.getBButton()) {
+                intakeMotor.set(0.4);
                 ampMotor.set(0.3);
-            } else if (IO.dController.getBButtonReleased()) {
-                rightIntakeMotor.set(0);
+            } else {
+                intakeMotor.set(0);
                 ampMotor.set(0);
             }
         }
@@ -243,13 +243,13 @@ public class Manipulator {
         //This method will move the manipulator forward
         public void moveManipulator(boolean isNegative) {
         if (!isNegative) {   
-            if (IO.dController.getRightTriggerAxis() > 0.4) {
+            if (IO.dController.getRightBumper()) {
                 rightBaseMotor.set(0.3);
             } else {
                 rightBaseMotor.set(0);
             }
         } else {
-            if (IO.dController.getLeftTriggerAxis() > 0.4) {
+            if (IO.dController.getLeftBumper()) {
                 rightBaseMotor.set(-0.3);
             } else {
                 rightBaseMotor.set(0);
@@ -286,7 +286,7 @@ public class Manipulator {
         //#CONTROLMANIPULATOR
         //This method will add keybinds for all the control methods in the manipulator class
         public void controlManipulator() {
-            if (IO.dController.getAButton()) manualControl();
+            if (IO.dController.getStartButton()) manualControl();
         if (usingDigitalSensors) {
             if (IO.dController.getLeftTriggerAxis() > 0.4) intake(4);
             if (IO.dController.getRightBumper()) moveManipulator(false);
