@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.LimeLight;
 import frc.robot.subsystems.Manipulator;
 
@@ -25,6 +26,7 @@ public class Robot extends TimedRobot {
 
   private LimeLight limelight = new LimeLight();
   private static Manipulator manipulator = new Manipulator();
+  private LED led = new LED();
 
   //#AUTOMODE
   //This function selects which auto to use based on a number input
@@ -48,6 +50,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
    DriveTrain.resetDrive();
    manipulator.initializeManipulator();
+   led.initializeLED();
   }
 
   /**

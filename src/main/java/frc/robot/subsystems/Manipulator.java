@@ -12,12 +12,15 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class Manipulator {
     
+    //Create the LED class object
+    private LED led = new LED();
+
     //Create the motor controller objects
     CANSparkMax leftBaseMotor = new CANSparkMax(Constants.leftBaseID, MotorType.kBrushed);
     CANSparkMax rightBaseMotor = new CANSparkMax(Constants.rightBaseID, MotorType.kBrushed);
     CANSparkMax ampMotor = new CANSparkMax(Constants.ampID, MotorType.kBrushless);
-    static CANSparkMax intakeMotor = new CANSparkMax(Constants.rightIntakeID, MotorType.kBrushless);
-    CANSparkMax followerAmpMotor = new CANSparkMax(Constants.leftIntakeID, MotorType.kBrushless);
+    static CANSparkMax intakeMotor = new CANSparkMax(Constants.intakeID, MotorType.kBrushless);
+    CANSparkMax followerAmpMotor = new CANSparkMax(Constants.ampFollowID, MotorType.kBrushless);
 
     //Create the encoder objects
     RelativeEncoder leftBaseEncoder = leftBaseMotor.getEncoder();
@@ -90,10 +93,12 @@ public class Manipulator {
             leftBaseEncoder.setPosition(0);
 
             didAmpPosition = true;
+            led.setBoard("green");
         }
     } else {
         rightBaseMotor.set(0);
         didAmpPosition = false;
+        led.setBoard("red");
     }
     }
 
@@ -111,10 +116,12 @@ public class Manipulator {
         } else {
             rightBaseMotor.set(0);
             didShootPosition = true;
+            led.setBoard("green");
         }
     } else {
         rightBaseMotor.set(0);
         didShootPosition = false;
+        led.setBoard("red");
     }
     }
 

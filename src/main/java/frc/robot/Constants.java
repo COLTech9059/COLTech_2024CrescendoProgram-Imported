@@ -24,14 +24,14 @@ public final class Constants {
  public static int leftBaseID = 6;
  public static int rightBaseID = 7;
  public static int ampID = 8;
- public static int rightIntakeID = 9;
- public static int leftIntakeID = 10;
+ public static int intakeID = 9;
+ public static int ampFollowID = 10;
  
  //Digital inputs DIO ports
  public static int beamSensorID = 0;
  public static int magneticSensorID = 1;
 
- //Miscellaneus manipulator IDs
+ //Miscellaneus manipulator values
  public static int shootPosition = 2;
  
  //LED port (PWM)

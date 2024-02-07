@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer; //Unused, but here.
 public class LimeLight {
 
     private DriveTrain drivetrain = new DriveTrain();
+    private LED led = new LED();
 
     //setup networktable upon creation
     private NetworkTable nTable = NetworkTableInstance.getDefault().getTable("limelight");
@@ -39,6 +40,7 @@ public class LimeLight {
     private final double[] heightArray = {50.125, 53.88, 0.0, 0.0, 0.0, 0.0, 50.125, 53.88};
 
     //CONSTANTS
+
     //Physical distance of limelight LENS from ground (measured in INCHES)
     private final double LensDistFromGround = 11.25;
     //Physical vertical angle of lens from mount (measured in DEGREES).
@@ -145,6 +147,7 @@ public class LimeLight {
         if(driveTimer.get() > 3.0 && refreshTimer.get() > 3.0){
             driveTrain.HamsterDrive.arcadeDrive(0, 0);
             stop();
+            led.setBoard("red");
         }
         if (enabled){
             if (driveTimer.get() == 0.0 && targetFound) {driveTimer.start(); refreshTimer.start();}
@@ -157,6 +160,7 @@ public class LimeLight {
                 double currentDist = estimateDist();
                 double distError = desiredDist - currentDist; //Distance from desired point. Calculated in Inches.
                 if (distError > 2.5 || distError < -2.5){
+                    led.setBoard("blue");
                     //Calculate driving adjust percentage for turning.
                     double drivingAdjust  = ((correctionMod * distError) * .1); //% of angle (i think)
                     //Cap the speed at 45% and set the floor at 25%
@@ -173,6 +177,7 @@ public class LimeLight {
                     showTurnPower = turnPower;
                     driveTrain.HamsterDrive.arcadeDrive(speed, turnPower);
                 } else {
+                    led.setBoard("green");
                     driveTrain.HamsterDrive.arcadeDrive(0, 0);
                     stop();
                 }
@@ -189,6 +194,7 @@ public class LimeLight {
         if (seekTimer.get() > 10.0 && seesTarget == 0.0){
             driveTrain.HamsterDrive.arcadeDrive(0, 0);
             stop();
+            led.setBoard("red");
         }
         if (enabled) {
            if (seekTimer.get() <= 0.0 && !targetFound) seekTimer.start();
@@ -197,6 +203,7 @@ public class LimeLight {
                 if (seesTarget == 0.0){
                     steeringPow = .35;
                     driveTrain.HamsterDrive.arcadeDrive(0, steeringPow);
+                    led.setBoard("blue");
                 } else {
                     //Else if it is visible then...
                     //Runs if it is not in the threshold.
@@ -210,6 +217,7 @@ public class LimeLight {
                         seekTimer.stop();
                         seekTimer.reset();
                         targetFound = true;
+                        led.setBoard("green");
                     }
                 }
            }
