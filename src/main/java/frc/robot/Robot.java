@@ -27,17 +27,18 @@ public class Robot extends TimedRobot {
   private LimeLight limelight = new LimeLight();
   private static Manipulator manipulator = new Manipulator();
   private LED led = new LED();
+  private DriveTrain drivetrain = new DriveTrain();
 
   //#AUTOMODE
   //This function selects which auto to use based on a number input
-  public static void autoMode(int autoSelector) {
+  public void autoMode(int autoSelector) {
     if (autoSelector == 1) {
-      manipulator.autoManipulator(false, true, true, false);
-      DriveTrain.autoDrive(0.3, 24);
-      manipulator.autoManipulator(true, true, false, false);
-      DriveTrain.autoDrive(0.3, 24);
-      manipulator.autoManipulator(false, true, true, false);
-      DriveTrain.autoDrive(0.3, 36);
+      manipulator.autoManipulator(false, true, true, false, false);
+      drivetrain.autoDrive(0.3, 24, 0, 0);
+      manipulator.autoManipulator(true, true, false, false, false);
+      drivetrain.autoDrive(0.3, -24, 0, 0);
+      manipulator.autoManipulator(false, true, true, false, false);
+      drivetrain.autoDrive(0.3, 36, 0, 0);
     }
   }
   /**

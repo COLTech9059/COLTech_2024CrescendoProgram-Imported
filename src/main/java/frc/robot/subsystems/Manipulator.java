@@ -315,13 +315,14 @@ public class Manipulator {
 
         //#AUTOMANIPULATOR
         //This method will do all of the actions for our manipulator during auto
-        public void autoManipulator(boolean doesIntake, boolean doesAim, boolean doesShoot, boolean doesAmp) {
+        public void autoManipulator(boolean doesIntake, boolean doesAim, boolean doesShoot, boolean doesAmpAim, boolean doesAmp) {
             if (doesIntake) {
                 moveManipulator(1.5, false);
                 intake(4);
             }
-            if (doesAim) ampPosition(5);
+            if (doesAim) shootPosition(5);
             if (doesShoot) shootNote(3);
+            if (doesAmpAim) ampPosition(5);
             if (doesAmp) ampScore(4);
         }
 }

@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,13 +41,21 @@ public class DriveTrain extends SubsystemBase {
 }
 
 
+Timer turnTimer = new Timer();
 
 //#AUTODRIVE
 //This method drives the auto for _ amount of time in a + or - direction
-public static void autoDrive(double speed, double distance) {
+public void autoDrive(double speed, double distance, double turn, double turnTime) {
+  turnTimer.reset();
+  turnTimer.start();
   if (rightDistance < distance) {
     HamsterDrive.arcadeDrive(speed, 0, false);
   } else if (rightDistance >= distance) {
+    HamsterDrive.arcadeDrive(0, 0, false);
+  }
+  if (turnTimer.get() < turnTime && turn != 0) {
+    HamsterDrive.arcadeDrive(0, turn, false);
+  } else if (turnTimer.get() >= turnTime && turn != 0) {
     HamsterDrive.arcadeDrive(0, 0, false);
   }
 }
