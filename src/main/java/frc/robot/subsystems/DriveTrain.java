@@ -49,13 +49,22 @@ Timer turnTimer = new Timer();
 //#AUTODRIVE
 //This method drives the auto for _ amount of time in a + or - direction
 public void autoDrive(double speed, double distance, double turn, double turnTime) {
+  rightDistance = 0;
   turnTimer.reset();
   turnTimer.start();
-  if (rightDistance < distance) {
+  //Drive with positive distance
+  if (distance > 0 && rightDistance < distance) {
     HamsterDrive.arcadeDrive(speed, 0, false);
   } else if (rightDistance >= distance) {
     HamsterDrive.arcadeDrive(0, 0, false);
   }
+  //Drive with negative distance
+    if (distance < 0 && rightDistance > distance) {
+    HamsterDrive.arcadeDrive(-speed, 0, false);
+  } else if (rightDistance >= distance) {
+    HamsterDrive.arcadeDrive(0, 0, false);
+  }
+  //Turn
   if (turnTimer.get() < turnTime && turn != 0) {
     HamsterDrive.arcadeDrive(0, turn, false);
   } else if (turnTimer.get() >= turnTime && turn != 0) {
