@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-   DriveTrain.resetDrive();
+   drivetrain.resetDrive();
    manipulator.initializeManipulator();
    led.initializeLED();
   }
@@ -112,7 +112,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    DriveTrain.drive();
+    drivetrain.drive();
 
     manipulator.controlManipulator();
     while (IO.dController.getAButton()) limelight.activateLimelight();
