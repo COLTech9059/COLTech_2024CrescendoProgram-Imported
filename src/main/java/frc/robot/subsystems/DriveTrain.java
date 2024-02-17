@@ -76,7 +76,7 @@ public class DriveTrain extends SubsystemBase
     {
       HamsterDrive.arcadeDrive(-speed, 0, false);
     } 
-    else if (rightDistance >= distance) 
+    else if (rightDistance <= distance) 
     {
       HamsterDrive.arcadeDrive(0, 0, false);
     }
