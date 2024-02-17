@@ -33,6 +33,7 @@ public final class Constants {
 
  //Miscellaneus manipulator values
  public static int shootPosition = 2;
+ public static int ampPosition = 15;
  
  //LED port (PWM)
  public static int ledPort = 0;

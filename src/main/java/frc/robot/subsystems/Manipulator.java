@@ -32,7 +32,7 @@ public class Manipulator
 
     //Create the digital input objects
     static DigitalInput beamSensor = new DigitalInput(Constants.beamSensorID);
-    DigitalInput magneticSensor = new DigitalInput(Constants.magneticSensorID);
+    DigitalInput magneticSensor = new DigitalInput(Constants.magneticSensorID); //Reading true = Sensor not triggered, reading false = Sensor is triggered
 
     private boolean usingDigitalSensors = true;
 
@@ -79,30 +79,32 @@ public class Manipulator
     }
 
     
-    private static boolean didAmpPosition = false;
+    private static boolean didIntakePosition = false;
     private static Timer posTimer = new Timer();
 
-    //#AMPPOSITION
+    //#INTAKEPOSITION
     //This method will run the manipulator base motors until the magnetic sensor is triggered at the amp spitting position
-    public void ampPosition(double timeout) 
+    public void intakePosition(double timeout) 
     {
         posTimer.reset();
         posTimer.start();
 
         if (posTimer.get() <= timeout) 
         {
-            if (!magneticSensor.get()) 
+            if (magneticSensor.get()) 
             {
             rightBaseMotor.set(-0.3);
             } 
-            else if (magneticSensor.get()) 
+            else if (!magneticSensor.get()) 
             {
             rightBaseMotor.set(0);
             rightBaseEncoder.setPosition(0);
             leftBaseEncoder.setPosition(0);
 
-            didAmpPosition = true;
+            didIntakePosition = true;
             led.setBoard("green");
+            posTimer.stop();
+            posTimer.reset();
             }
         } 
         else 
@@ -141,6 +143,38 @@ public class Manipulator
         {
         rightBaseMotor.set(0);
         didShootPosition = false;
+        led.setBoard("red");
+        }
+    }
+
+
+    private static Timer ampPosTime = new Timer();
+    private boolean didAmpPosition = false;
+
+    //#AMPPOSITION
+    //This method will bring the manipulator to a position for it to shoot from
+    public void ampPosition(double timeout) 
+    {
+        ampPosTime.reset();
+        ampPosTime.start();
+
+        if (ampPosTime.get() <= timeout) 
+        {
+            if (rightBaseEncoder.getPosition() <= Constants.ampPosition) 
+            {
+            rightBaseMotor.set(0.3);
+            } 
+            else 
+            {
+            rightBaseMotor.set(0);
+            didAmpPosition = true;
+            led.setBoard("green");
+            }
+        } 
+        else 
+        {
+        rightBaseMotor.set(0);
+        didAmpPosition = false;
         led.setBoard("red");
         }
     }
@@ -380,22 +414,26 @@ public class Manipulator
             
             if (usingDigitalSensors) 
             {
-            if (IO.dController.getLeftTriggerAxis() > 0.4) intake(4);
-            if (IO.dController.getRightBumper()) moveManipulator(false);
-            if (IO.dController.getLeftBumper()) moveManipulator(true);
-            if ( ( !IO.dController.getLeftBumper() && !IO.dController.getRightBumper() ) || ( IO.dController.getLeftBumper() && IO.dController.getRightBumper() )) stopManipulator();
-            if (IO.dController.getYButton()) ampPosition(5);
-            if (IO.dController.getXButton()) shootPosition(4);
-            if (IO.dController.getBButton()) ampScore(4);
-            if (IO.dController.getRightTriggerAxis() > 0.4) shootNote(3);
+                if (IO.dController.getLeftTriggerAxis() > 0.4) intake(4);
+                if (IO.dController.getRightBumper()) moveManipulator(false);
+                if (IO.dController.getLeftBumper()) moveManipulator(true);
+                if ( ( !IO.dController.getLeftBumper() && !IO.dController.getRightBumper() ) || ( IO.dController.getLeftBumper() && IO.dController.getRightBumper() )) stopManipulator();
+                if (IO.dController.getYButton()) intakePosition(5);
+                if (IO.dController.getXButton()) shootPosition(4);
+                if (IO.dController.getBButton()) 
+                {
+                    ampPosition(5);
+                    ampScore(4);
+                }
+                if (IO.dController.getRightTriggerAxis() > 0.4) shootNote(3);
             } 
             else 
             {
-            if (IO.dController.getRightBumper()) moveManipulator(false);
-            if (IO.dController.getLeftBumper()) moveManipulator(true);
-            if (IO.dController.getRightTriggerAxis() > 0.4) shootNote();
-            if (IO.dController.getLeftTriggerAxis() > 0.4) intake();
-            if (IO.dController.getBButton()) ampScore();
+                if (IO.dController.getRightBumper()) moveManipulator(false);
+                if (IO.dController.getLeftBumper()) moveManipulator(true);
+                if (IO.dController.getRightTriggerAxis() > 0.4) shootNote();
+                if (IO.dController.getLeftTriggerAxis() > 0.4) intake();
+                if (IO.dController.getBButton()) ampScore();
             }
         }
 
@@ -407,8 +445,8 @@ public class Manipulator
         {
             if (doesIntake) 
             {
-                moveManipulator(1.5, true);
-                intake(4);
+                intakePosition(5);
+                intake(3);
             }
             if (doesAim) shootPosition(5);
             if (doesShoot) shootNote(3);
