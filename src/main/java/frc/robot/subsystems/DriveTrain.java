@@ -58,6 +58,8 @@ public class DriveTrain extends SubsystemBase
     rightDistance = 0;
     turnTimer.reset();
     turnTimer.start();
+    rightEncoder.setPosition(0);
+    leftEncoder.setPosition(0);
 
     //Drive with positive distance
     if (distance > 0 && rightDistance < distance) 

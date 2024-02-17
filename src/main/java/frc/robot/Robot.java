@@ -33,6 +33,8 @@ public class Robot extends TimedRobot {
   //This function selects which auto to use based on a number input
   public void autoMode(int autoSelector) 
   {
+    //Auto #1 will shoot one note, drive forward to grab another, shoot that note, and then leave the starting area
+    //Used for middle position - No limelight
     if (autoSelector == 1) 
     {
       manipulator.autoManipulator(false, true, true, false, false);
