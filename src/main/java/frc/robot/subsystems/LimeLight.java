@@ -42,9 +42,9 @@ public class LimeLight {
     //CONSTANTS
 
     //Physical distance of limelight LENS from ground (measured in INCHES)
-    private final double LensDistFromGround = 11.25;
+    private final double LensDistFromGround = 10.00;
     //Physical vertical angle of lens from mount (measured in DEGREES).
-    private final double LensAngleFromMount = 41.9;
+    private final double LensAngleFromMount = 22.0;
     //Physical height of chosen AprilTag.
     //If needed, create a table that holds the AprilTag IDs and its height from the ground.
     // private final double targetHeight = 53.88;
@@ -142,7 +142,7 @@ public class LimeLight {
     /* Allows the robot to precisely get in range of a target.
      * THEORETICALLY should work.
      */
-    private double speed = .45;
+    private double speed = -.45;
     public void getInRangeUsingDistance(DriveTrain driveTrain){
         if(driveTimer.get() > 3.0 && refreshTimer.get() > 3.0){
             driveTrain.HamsterDrive.arcadeDrive(0, 0);
@@ -164,12 +164,12 @@ public class LimeLight {
                     //Calculate driving adjust percentage for turning.
                     double drivingAdjust  = ((correctionMod * distError) * .1); //% of angle (i think)
                     //Cap the speed at 45% and set the floor at 25%
-                    if (drivingAdjust > 0) speed = -.45;
-                    else if (drivingAdjust < 0) speed = .45;
+                    if (drivingAdjust > 0) speed = .45;
+                    else if (drivingAdjust < 0) speed = -.45;
                     // if (drivingAdjust < .325 && drivingAdjust > 0.0) speed = .325;
                     // else if (drivingAdjust > -.325 && drivingAdjust < 0.0) speed = -.325;
                     //Cap turn power at 35% of value
-                    double turnPower = -Math.pow((this.currentX*.1), 3);
+                    double turnPower = Math.pow((this.currentX*.1), 3);
                     if (turnPower < -.35)
                         turnPower = -.35;
                     else if (turnPower > .35)
@@ -208,8 +208,8 @@ public class LimeLight {
                     //Else if it is visible then...
                     //Runs if it is not in the threshold.
                     if ((currentX > 5.0 || currentX < -5.0) && seesTarget != 0.0){
-                        if (currentX > 0.0) steeringPow = -.35;
-                        else if (currentX < 0.0) steeringPow = .35;
+                        if (currentX > 0.0) steeringPow = .35;
+                        else if (currentX < 0.0) steeringPow = -.35;
                         driveTrain.HamsterDrive.arcadeDrive(0, steeringPow);
                     } else if ((currentX < 5 && currentX > -5) && seesTarget != 0.0){
                         //We have found the target. Stop turning.
@@ -243,8 +243,10 @@ public class LimeLight {
         SmartDashboard.putNumber("TurnPowerAdjust", showTurnPower);
     }
 
+    public boolean llIsActive = false;
     public void activateLimelight () {
         seekTarget(drivetrain);
         getInRangeUsingDistance(drivetrain);
+        llIsActive = true;
     }
 }

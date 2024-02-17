@@ -14,10 +14,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.IO;
+import frc.robot.Robot;
 
 
 public class DriveTrain extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
+
+    private Robot robot = new Robot();
 
     //create motor controller objects
     private static CANSparkMax leftP = new CANSparkMax(Constants.leftPID, MotorType.kBrushless);
@@ -148,7 +151,7 @@ public void resetDrive() {
     // Drive the Robot with <forwardPower> and <turnPower>
     if (IO.dController.getRightX() > 0.1 || IO.dController.getRightX() < -0.1 || IO.dController.getLeftY() > 0.1 || IO.dController.getLeftY() < -0.1) {
     HamsterDrive.arcadeDrive(forwardPower, turnPower);
-    } else if (IO.dController.getLeftY() > -0.1 && IO.dController.getLeftY() < 0.1 && IO.dController.getRightX() < 0.1 && IO.dController.getRightX() > -0.1) {
+    } else if (!robot.limelight.llIsActive && IO.dController.getLeftY() > -0.1 && IO.dController.getLeftY() < 0.1 && IO.dController.getRightX() < 0.1 && IO.dController.getRightX() > -0.1) {
     stepDownDrive();
     }
     }
