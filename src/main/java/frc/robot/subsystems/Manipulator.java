@@ -306,7 +306,7 @@ public class Manipulator
             {   
                 if (IO.dController.getRightBumper()) 
                 {
-                rightBaseMotor.set(0.3);
+                rightBaseMotor.set(0.2);
                 } 
                 else 
                 {
@@ -317,7 +317,7 @@ public class Manipulator
             {
                 if (IO.dController.getLeftBumper()) 
                 {
-                rightBaseMotor.set(-0.3);
+                rightBaseMotor.set(-0.2);
                 } 
                 else 
                 {
@@ -338,7 +338,7 @@ public class Manipulator
             {
                 if (moveTimer.get() <= moveTime) 
                 {
-                rightBaseMotor.set(0.3);
+                rightBaseMotor.set(0.2);
                 } 
                 else 
                 {
@@ -353,7 +353,7 @@ public class Manipulator
 
                 if (moveTimer2.get() <= moveTime) 
                 {
-                rightBaseMotor.set(-0.3);
+                rightBaseMotor.set(-0.2);
                 } else 
                 {
                 rightBaseMotor.set(0);
