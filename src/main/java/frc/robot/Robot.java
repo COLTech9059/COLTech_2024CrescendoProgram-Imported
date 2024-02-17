@@ -31,8 +31,10 @@ public class Robot extends TimedRobot {
 
   //#AUTOMODE
   //This function selects which auto to use based on a number input
-  public void autoMode(int autoSelector) {
-    if (autoSelector == 1) {
+  public void autoMode(int autoSelector) 
+  {
+    if (autoSelector == 1) 
+    {
       manipulator.autoManipulator(false, true, true, false, false);
       drivetrain.autoDrive(0.3, 24, 0, 0);
       manipulator.autoManipulator(true, true, false, false, false);
@@ -46,7 +48,8 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {
+  public void robotInit() 
+  {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
    drivetrain.resetDrive();
@@ -62,7 +65,8 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {
+  public void robotPeriodic() 
+  {
 
     DriveTrain.encoderMath();
     manipulator.manipulatorDashboard();
@@ -83,35 +87,41 @@ public class Robot extends TimedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {
+  public void autonomousInit() 
+  {
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
+    if (m_autonomousCommand != null) 
+    {
       m_autonomousCommand.schedule();
     }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
+  public void autonomousPeriodic() 
+  {
     autoMode(1);
     limelight.activateLimelight();
   }
 
   @Override
-  public void teleopInit() {
+  public void teleopInit() 
+  {
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
+    if (m_autonomousCommand != null) 
+    {
       m_autonomousCommand.cancel();
     }
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
+  public void teleopPeriodic() 
+  {
     drivetrain.drive();
 
     manipulator.controlManipulator();
@@ -120,7 +130,8 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {
+  public void testInit() 
+  {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
