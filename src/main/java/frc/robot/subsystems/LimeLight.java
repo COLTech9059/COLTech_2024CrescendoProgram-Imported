@@ -254,12 +254,13 @@ public class LimeLight {
      */
     private double steeringPow = .3;
 
-    public void seekTarget(DriveTrain driveTrain)
+    public boolean seekTarget(DriveTrain driveTrain)
     {
         if (seekTimer.get() > 10.0 && seesTarget == 0.0)
         {
             driveTrain.HamsterDrive.arcadeDrive(0, 0);
             stop();
+            targetFound = false;
             led.setBoard("red");
         }
         if (enabled) 
@@ -305,6 +306,7 @@ public class LimeLight {
                 }
            }
         }
+        return targetFound;
     }
 
 
@@ -334,8 +336,14 @@ public class LimeLight {
     public boolean llIsActive = false;
     public void activateLimelight () 
     {
-        seekTarget(drivetrain);
-        getInRangeUsingDistance(drivetrain);
-        llIsActive = true;
+        if (!seekTarget(drivetrain)) 
+        {
+            seekTarget(drivetrain);
+        }
+        else 
+        {
+            estimateDist();
+            getInRangeUsingDistance(drivetrain);
+        }
     }
 }
