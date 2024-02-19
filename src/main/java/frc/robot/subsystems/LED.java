@@ -25,7 +25,7 @@ public class LED
         }
 
         //#SETBOARD
-        //THis method will the whole LED board to one color
+        //This method will the whole LED board to one color
         public void setBoard(String color) 
         {
             if (color.equals("blue")) 
