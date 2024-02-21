@@ -24,9 +24,9 @@ import frc.robot.subsystems.Manipulator;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  public LimeLight limelight = new LimeLight();
+  public static LimeLight limelight = new LimeLight();
   private static Manipulator manipulator = new Manipulator();
-  private LED led = new LED();
+  // private LED led = new LED();
   private DriveTrain drivetrain = new DriveTrain();
 
   //#AUTOMODE
@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
    drivetrain.resetDrive();
    manipulator.initializeManipulator();
-   led.initializeLED();
+  //  led.initializeLED();
   }
 
   /**

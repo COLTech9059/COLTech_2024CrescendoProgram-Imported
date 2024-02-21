@@ -14,11 +14,11 @@ public class Manipulator
 {
     
     //Create the LED class object
-    private LED led = new LED();
+    // private LED led = new LED();
 
     //Create the motor controller objects
-    CANSparkMax leftBaseMotor = new CANSparkMax(Constants.leftBaseID, MotorType.kBrushed);
-    CANSparkMax rightBaseMotor = new CANSparkMax(Constants.rightBaseID, MotorType.kBrushed);
+    CANSparkMax leftBaseMotor = new CANSparkMax(Constants.leftBaseID, MotorType.kBrushless);
+    CANSparkMax rightBaseMotor = new CANSparkMax(Constants.rightBaseID, MotorType.kBrushless);
     CANSparkMax ampMotor = new CANSparkMax(Constants.ampID, MotorType.kBrushless);
     static CANSparkMax intakeMotor = new CANSparkMax(Constants.intakeID, MotorType.kBrushless);
     CANSparkMax followerAmpMotor = new CANSparkMax(Constants.ampFollowID, MotorType.kBrushless);
@@ -102,7 +102,7 @@ public class Manipulator
             leftBaseEncoder.setPosition(0);
 
             didIntakePosition = true;
-            led.setBoard("green");
+            // led.setBoard("green");
             posTimer.stop();
             posTimer.reset();
             }
@@ -111,7 +111,7 @@ public class Manipulator
         {
         rightBaseMotor.set(0);
         didIntakePosition = false;
-        led.setBoard("red");
+        // led.setBoard("red");
         }
     }
 
@@ -140,14 +140,14 @@ public class Manipulator
             {
                 rightBaseMotor.set(0);
                 didShootPosition = true;
-                led.setBoard("green");
+                // led.setBoard("green");
             }
         } 
         else 
         {
         rightBaseMotor.set(0);
         didShootPosition = false;
-        led.setBoard("red");
+        // led.setBoard("red");
         }
     }
 
@@ -172,14 +172,14 @@ public class Manipulator
             {
             rightBaseMotor.set(0);
             didAmpPosition = true;
-            led.setBoard("green");
+            // led.setBoard("green");
             }
         } 
         else 
         {
         rightBaseMotor.set(0);
         didAmpPosition = false;
-        led.setBoard("red");
+        // led.setBoard("red");
         }
     }
 

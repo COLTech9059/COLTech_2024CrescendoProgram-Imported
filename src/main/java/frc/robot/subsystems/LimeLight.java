@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Timer; //Unused, but here.
 public class LimeLight {
 
     private DriveTrain drivetrain = new DriveTrain();
-    private LED led = new LED();
+    // private LED led = new LED();
 
     //setup networktable upon creation
     private NetworkTable nTable = NetworkTableInstance.getDefault().getTable("limelight");
@@ -184,7 +184,7 @@ public class LimeLight {
         {
             driveTrain.HamsterDrive.arcadeDrive(0, 0);
             stop();
-            led.setBoard("red");
+            // led.setBoard("red");
         }
         if (enabled)
         {
@@ -204,7 +204,7 @@ public class LimeLight {
 
                 if (distError > 2.5 || distError < -2.5)
                 {
-                    led.setBoard("blue");
+                    // led.setBoard("blue");
 
                     //Calculate driving adjust percentage for turning.
                     double drivingAdjust  = ((correctionMod * distError) * .1); //% of angle (i think)
@@ -237,7 +237,7 @@ public class LimeLight {
                 } 
                 else 
                 {
-                    led.setBoard("green");
+                    // led.setBoard("green");
                     driveTrain.HamsterDrive.arcadeDrive(0, 0);
                     stop();
                 }
@@ -261,7 +261,7 @@ public class LimeLight {
             driveTrain.HamsterDrive.arcadeDrive(0, 0);
             stop();
             targetFound = false;
-            led.setBoard("red");
+            // led.setBoard("red");
         }
         if (enabled) 
         {
@@ -274,7 +274,7 @@ public class LimeLight {
                 {
                     steeringPow = .35;
                     driveTrain.HamsterDrive.arcadeDrive(0, steeringPow);
-                    led.setBoard("blue");
+                    // led.setBoard("blue");
                 } 
                 else 
                 {
@@ -301,7 +301,7 @@ public class LimeLight {
                         seekTimer.stop();
                         seekTimer.reset();
                         targetFound = true;
-                        led.setBoard("green");
+                        // led.setBoard("green");
                     }
                 }
            }

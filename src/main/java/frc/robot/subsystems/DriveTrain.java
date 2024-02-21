@@ -21,7 +21,7 @@ public class DriveTrain extends SubsystemBase
 {
   /** Creates a new ExampleSubsystem. */
 
-    private Robot robot = new Robot();
+    // private Robot robot = new Robot();
 
     //create motor controller objects
     private static CANSparkMax leftP = new CANSparkMax(Constants.leftPID, MotorType.kBrushless);
@@ -173,7 +173,7 @@ public class DriveTrain extends SubsystemBase
         {
         HamsterDrive.arcadeDrive(forwardPower, turnPower);
         } 
-        else if (!robot.limelight.llIsActive && IO.dController.getLeftY() > -0.1 && IO.dController.getLeftY() < 0.1 && IO.dController.getRightX() < 0.1 && IO.dController.getRightX() > -0.1) 
+        else if (!Robot.limelight.llIsActive && IO.dController.getLeftY() > -0.1 && IO.dController.getLeftY() < 0.1 && IO.dController.getRightX() < 0.1 && IO.dController.getRightX() > -0.1) 
         {
         stopDrive();
         }
