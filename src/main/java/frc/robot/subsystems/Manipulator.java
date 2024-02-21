@@ -56,7 +56,6 @@ public class Manipulator
 
         //Set the leftIntakeMotor as a follower
         followerAmpMotor.follow(ampMotor);
-        followerAmpMotor.setInverted(true);
 
         //Set the leftBaseMotor as a follower
         leftBaseMotor.follow(rightBaseMotor);
@@ -188,6 +187,9 @@ public class Manipulator
         //This method updates the dashboard with all the data from the manipulator class
         public void manipulatorDashboard() 
         {
+            //Tell if it is in manual or not
+            SmartDashboard.putBoolean("Is Manual?", usingDigitalSensors);
+
             //Push the digital sensor data to the shuffleboard
             SmartDashboard.putBoolean("Beam Sensor", beamSensor.get());
             SmartDashboard.putBoolean("Magnetic Sensor", magneticSensor.get());
@@ -266,7 +268,7 @@ public class Manipulator
                 {
                 shootTime.start();
                 intakeMotor.set(0);
-                ampMotor.set(1);
+                ampMotor.set(-0.6);
                 } 
                 if (!beamSensor.get() && shootTime.get() >= 1) 
                 {
@@ -281,7 +283,7 @@ public class Manipulator
         public void shootNote() 
         {
             intakeMotor.set(0.4);
-            ampMotor.set(1);
+            ampMotor.set(0.6);
         }
 
         //#STOPSHOOT
@@ -317,12 +319,12 @@ public class Manipulator
                 {
                 ampTime.start();
                 intakeMotor.set(0);
-                ampMotor.set(0.3);
+                ampMotor.set(-0.7);
                 } 
                 if (!beamSensor.get() && ampTime.get() >= 1.5) 
                 {
                 ampMotor.set(0);
-                ampTime.stop();
+                ampTime.stop(); 
                 }
             }
         }
@@ -332,7 +334,7 @@ public class Manipulator
         public void ampScore() 
         {
             intakeMotor.set(0.4);
-            ampMotor.set(0.3);
+            ampMotor.set(-0.7);
         }
 
 
@@ -376,7 +378,7 @@ public class Manipulator
             {
                 if (moveTimer.get() <= moveTime) 
                 {
-                rightBaseMotor.set(0.2);
+                rightBaseMotor.set(-0.2);
                 } 
                 else 
                 {
@@ -391,7 +393,7 @@ public class Manipulator
 
                 if (moveTimer2.get() <= moveTime) 
                 {
-                rightBaseMotor.set(-0.2);
+                rightBaseMotor.set(0.2);
                 } else 
                 {
                 rightBaseMotor.set(0);
@@ -401,7 +403,7 @@ public class Manipulator
 
 
 
-        //#STOPMANIPULATOR
+        // #STOPMANIPULATOR
         //This method stops the manipulator motors
         public void stopManipulator () 
         {
@@ -422,13 +424,13 @@ public class Manipulator
                 if (IO.dController.getRightBumper()) moveManipulator(false);
                 if (IO.dController.getLeftBumper()) moveManipulator(true);
                 if ( ( !IO.dController.getLeftBumper() && !IO.dController.getRightBumper() ) || ( IO.dController.getLeftBumper() && IO.dController.getRightBumper() )) stopManipulator();
-                if (IO.dController.getYButton()) intakePosition(5);
-                if (IO.dController.getXButton()) shootPosition(4);
-                if (IO.dController.getBButton()) 
-                {
-                    ampPosition(5);
-                    ampScore(4);
-                }
+                // if (IO.dController.getYButton()) intakePosition(5);
+                // if (IO.dController.getXButton()) shootPosition(4);
+                // if (IO.dController.getBButton()) 
+                // {
+                //     ampPosition(5);
+                //     ampScore(4);
+                // }
                 if (IO.dController.getRightTriggerAxis() > 0.4) shootNote(3);
             } 
             else 
@@ -437,7 +439,7 @@ public class Manipulator
                 if (IO.dController.getLeftBumper()) moveManipulator(true);
                 if ( ( !IO.dController.getLeftBumper() && !IO.dController.getRightBumper() ) || ( IO.dController.getLeftBumper() && IO.dController.getRightBumper() )) stopManipulator();
                 if (IO.dController.getRightTriggerAxis() > 0.4) shootNote();
-                if(IO.dController.getRightTriggerAxis() < 0.4) stopShoot();
+                if (IO.dController.getRightTriggerAxis() < 0.4) stopShoot();
                 if (IO.dController.getLeftTriggerAxis() > 0.4) intake();
                 if (IO.dController.getLeftTriggerAxis() < 0.4) stopIntake();
                 if (IO.dController.getBButton()) ampScore();

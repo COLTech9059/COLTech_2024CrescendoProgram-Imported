@@ -124,6 +124,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
+    drivetrain.HamsterDrive.setSafetyEnabled(false);
     drivetrain.drive();
 
     manipulator.controlManipulator();
