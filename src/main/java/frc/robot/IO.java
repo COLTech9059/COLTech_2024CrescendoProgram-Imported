@@ -9,4 +9,5 @@ public class IO {
 
     // Define new XboxController object
     public static XboxController dController = new XboxController(0);
+    public static XboxController oController = new XboxController(1);
 }

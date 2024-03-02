@@ -24,10 +24,10 @@ public class DriveTrain extends SubsystemBase
     // private Robot robot = new Robot();
 
     //create motor controller objects
-    private static CANSparkMax leftP = new CANSparkMax(Constants.leftPID, MotorType.kBrushless);
-    private static CANSparkMax rightP = new CANSparkMax(Constants.rightPID, MotorType.kBrushless);
-    private static CANSparkMax leftF = new CANSparkMax(Constants.leftFID, MotorType.kBrushless);
-    private static CANSparkMax rightF = new CANSparkMax(Constants.rightFID, MotorType.kBrushless);
+    private static CANSparkMax leftP = new CANSparkMax(2, MotorType.kBrushless);
+    private static CANSparkMax rightP = new CANSparkMax(3, MotorType.kBrushless);
+    private static CANSparkMax leftF = new CANSparkMax(4, MotorType.kBrushless);
+    private static CANSparkMax rightF = new CANSparkMax(5, MotorType.kBrushless);
   
     //create encoder objects
     static RelativeEncoder leftEncoder = leftP.getEncoder();
@@ -107,6 +107,7 @@ public class DriveTrain extends SubsystemBase
     leftF.follow(leftP);
     rightF.follow(rightP);
 
+    
     // Invert the right side motor controller
     rightP.setInverted(true);
 
@@ -119,6 +120,10 @@ public class DriveTrain extends SubsystemBase
     //Set the encoder positions to zero, effectively resetting them
     leftEncoder.setPosition(0);
     rightEncoder.setPosition(0);
+
+    //Set the motors to accelerate and decelerate slower
+    rightP.setOpenLoopRampRate(0.25);
+    leftP.setOpenLoopRampRate(0.25);
   }
 
 
@@ -166,38 +171,16 @@ public class DriveTrain extends SubsystemBase
         double turn = IO.dController.getRightX();
 
         // Reduce Turn Power
-        double turnPower = turn *= 0.82;
+        double turnPower = turn *= 1;
 
         // Drive the Robot with <forwardPower> and <turnPower>
-        if (IO.dController.getRightX() > 0.1 || IO.dController.getRightX() < -0.1 || IO.dController.getLeftY() > 0.1 || IO.dController.getLeftY() < -0.1) 
+        if (Math.abs(IO.dController.getRightX()) > 0.1 || Math.abs(IO.dController.getLeftY()) > 0.1) 
         {
-        HamsterDrive.arcadeDrive(forwardPower, turnPower);
+        HamsterDrive.arcadeDrive(forwardPower, -turnPower);
         } 
-        else if (!Robot.limelight.llIsActive && IO.dController.getLeftY() > -0.1 && IO.dController.getLeftY() < 0.1 && IO.dController.getRightX() < 0.1 && IO.dController.getRightX() > -0.1) 
+        else if (Math.abs(IO.dController.getLeftY()) < 0.1 && Math.abs(IO.dController.getRightX()) < 0.1) 
         {
         stopDrive();
         }
-      }
-
-
-
-      private Timer stepDownTime = new Timer();
-
-      //#STEPDOWNDRIVE
-      //This method will halve the speed of the drivetrain for half a second before stopping it entirely; 
-      //Acts as a buffer to stop the robot fron lifting off the ground
-      private void stepDownDrive() 
-      {
-        stepDownTime.reset();
-        stepDownTime.start();
-
-        if (stepDownTime.get() <= 0.5) 
-        {
-          HamsterDrive.arcadeDrive(forwardPower/2, 0, false);
-        }
-        else if (stepDownTime.get() > 0.5) 
-        {
-          stopDrive();
-        }
-      }
+      } 
 }

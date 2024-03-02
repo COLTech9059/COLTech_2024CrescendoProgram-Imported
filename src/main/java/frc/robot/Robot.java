@@ -70,6 +70,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() 
   {
 
+    drivetrain.HamsterDrive.setSafetyEnabled(false);
     DriveTrain.encoderMath();
     manipulator.manipulatorDashboard();
 
@@ -103,7 +104,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() 
   {
-    autoMode(1);
+    // autoMode(1);
     limelight.activateLimelight();
   }
 
@@ -124,10 +125,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() 
   {
-    drivetrain.HamsterDrive.setSafetyEnabled(false);
     drivetrain.drive();
-
     manipulator.controlManipulator();
+    
     while (IO.dController.getAButton()) limelight.activateLimelight();
 
   }
