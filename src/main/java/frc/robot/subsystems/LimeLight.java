@@ -1,14 +1,18 @@
 package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.lang.Character.Subset;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import edu.wpi.first.wpilibj.Timer; //Unused, but here.
+import edu.wpi.first.wpilibj.Timer;
 
-public class LimeLight {
+public class LimeLight extends SubsystemBase
+{
 
-    private DriveTrain drivetrain = new DriveTrain();
     // private LED led = new LED();
 
     //setup networktable upon creation
@@ -45,7 +49,7 @@ public class LimeLight {
     //CONSTANTS
 
         //Physical distance of limelight LENS from ground (measured in INCHES)
-        private final double LensDistFromGround = 10.00;
+        private final double LensDistFromGround = 9.75;
         //Physical vertical angle of lens from mount (measured in DEGREES).
         private final double LensAngleFromMount = 22.0;
         //Physical height of chosen AprilTag.
@@ -55,7 +59,7 @@ public class LimeLight {
         private final double correctionMod = -.1;
         //Preset distance from target.
         //Could put it in an array and designate it to an AprilTag.
-        private final double desiredDist = 36.0;
+        private final double desiredDist = 36.25;
 
     //#LIMELIGHT
     /* Constructor. Assigns values to the coordinate variables above.
@@ -81,7 +85,11 @@ public class LimeLight {
     }
 
 
-
+    public boolean getEnabled(){
+        return enabled;
+    }
+    
+    
     //#ESTIMATEDIST
     /* Does math to estimate the distance from the limelight to the target.
         Assumes that robot is centered on target.
@@ -92,7 +100,7 @@ public class LimeLight {
     {
         int tempID = (int) curTargetID;
 
-        if (tempID > 0.0)
+        if (tempID > 0)
         {
             targetHeight = heightArray[tempID];
         }
@@ -192,7 +200,7 @@ public class LimeLight {
 
             if (driveTimer.get() > 0.0)
             {
-                if(seesTarget == 1.0)
+                if(seesTarget != 0.0)
                 {
                     refreshTimer.reset();
                     refreshTimer.start();
@@ -252,7 +260,7 @@ public class LimeLight {
      * On the robot seeing it, centers on the target with a .5 degree range of error.
      * Unknown which way the directions are.
      */
-    private double steeringPow = .3;
+    private double steeringPow = .4;
 
     public boolean seekTarget(DriveTrain driveTrain)
     {
@@ -272,7 +280,7 @@ public class LimeLight {
             //If target isn't in view, set steeringPow to be a consistent .3. 
                 if (seesTarget == 0.0)
                 {
-                    steeringPow = .35;
+                    steeringPow = .4;
                     driveTrain.HamsterDrive.arcadeDrive(0, steeringPow);
                     // led.setBoard("blue");
                 } 
@@ -284,11 +292,11 @@ public class LimeLight {
                     {
                         if (currentX > 0.0) 
                         {
-                            steeringPow = .35;
+                            steeringPow = -.4;
                         }
                         else if (currentX < 0.0) 
                         {
-                            steeringPow = -.35;
+                            steeringPow = .4;
                         }
 
                         driveTrain.HamsterDrive.arcadeDrive(0, steeringPow);
@@ -334,16 +342,8 @@ public class LimeLight {
     }
 
     public boolean llIsActive = false;
-    public void activateLimelight () 
+    public void runLimelight (DriveTrain drivetrain) 
     {
-        if (!seekTarget(drivetrain)) 
-        {
-            seekTarget(drivetrain);
-        }
-        else 
-        {
-            estimateDist();
-            getInRangeUsingDistance(drivetrain);
-        }
+        if(seekTarget(drivetrain)) getInRangeUsingDistance(drivetrain);
     }
 }

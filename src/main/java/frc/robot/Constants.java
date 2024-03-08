@@ -28,12 +28,13 @@ public final class Constants {
  public static int intakeID = 10;
  
  //Digital inputs DIO ports
- public static int beamSensorID = 0;
- public static int magneticSensorID = 1;
+ public static int intakeSensorID = 0;
+ public static int frontSensorID = 1;
+ public static int backSensorID = 2;
 
  //Miscellaneus manipulator values
- public static int shootPosition = 2;
- public static int ampPosition = 15;
+ public static double shootPosition = -10.5;
+ public static double ampPosition = -30;
  
  //LED port (PWM)
  public static int ledPort = 0;

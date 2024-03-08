@@ -37,7 +37,6 @@ public class DriveTrain extends SubsystemBase
     public final DifferentialDrive HamsterDrive = new DifferentialDrive(leftP, rightP);
 
     double forwardPower;
-    private double stepDownSpeed;
 
   public DriveTrain() {}
 
@@ -45,21 +44,33 @@ public class DriveTrain extends SubsystemBase
   //Method to stop the drive train
   public void stopDrive() 
   {
-    HamsterDrive.stopMotor();
+    HamsterDrive.arcadeDrive(0, 0, false);
   }
 
 
   Timer turnTimer = new Timer();
 
+  public void drive(double forwardPow, double turnPow) 
+  {
+    HamsterDrive.arcadeDrive(forwardPow *.9, turnPow *-.8, false);
+  }
+
   //#AUTODRIVE
   //This method drives the auto for _ amount of time in a + or - direction
+  /* @Param speed     The forward speed of the robot, can be negative
+   * @Param distance  The distance that the robot will drive
+   * @Param turn      The speed at which the robot will turn, must be used seperately from regular driving
+   * @Param turnTime  The length of time for which the robot will turn
+  */ 
   public void autoDrive(double speed, double distance, double turn, double turnTime) 
   {
+    distance = Math.abs(distance);
     rightDistance = 0;
     turnTimer.reset();
     turnTimer.start();
     rightEncoder.setPosition(0);
     leftEncoder.setPosition(0);
+    rightDistance = Math.abs(rightEncoder.getPosition());
 
     //Drive with positive distance
     if (distance > 0 && rightDistance < distance) 
@@ -67,16 +78,6 @@ public class DriveTrain extends SubsystemBase
       HamsterDrive.arcadeDrive(speed, 0, false);
     } 
     else if (rightDistance >= distance) 
-    {
-      HamsterDrive.arcadeDrive(0, 0, false);
-    }
-
-    //Drive with negative distance
-    if (distance < 0 && rightDistance > distance) 
-    {
-      HamsterDrive.arcadeDrive(-speed, 0, false);
-    } 
-    else if (rightDistance <= distance) 
     {
       HamsterDrive.arcadeDrive(0, 0, false);
     }
@@ -98,10 +99,10 @@ public class DriveTrain extends SubsystemBase
   {
 
     // Reset the factory defaults for the motor controllers
-    leftP.restoreFactoryDefaults();
-    rightP.restoreFactoryDefaults();
-    leftF.restoreFactoryDefaults();
-    rightF.restoreFactoryDefaults(); 
+    // leftP.restoreFactoryDefaults();
+    // rightP.restoreFactoryDefaults();
+    // leftF.restoreFactoryDefaults();
+    // rightF.restoreFactoryDefaults(); 
 
     // Set up the motor controller followers
     leftF.follow(leftP);
@@ -162,8 +163,8 @@ public class DriveTrain extends SubsystemBase
         // Adjust Speed/Power so that it will always be at a max of 80%
         double change = 0;
 
-        if (forward < 0) change = 0.2;
-        if (forward > 0) change = -0.2;
+        if (forward < 0) change = 0.1;
+        if (forward > 0) change = -0.1;
 
         forwardPower = forward + change;
 
@@ -171,16 +172,16 @@ public class DriveTrain extends SubsystemBase
         double turn = IO.dController.getRightX();
 
         // Reduce Turn Power
-        double turnPower = turn *= 1;
+        double turnPower = turn *= 0.8;
 
         // Drive the Robot with <forwardPower> and <turnPower>
-        if (Math.abs(IO.dController.getRightX()) > 0.1 || Math.abs(IO.dController.getLeftY()) > 0.1) 
+        if (IO.dController.getRightX() > 0.1 || IO.dController.getRightX() < -0.1 || IO.dController.getLeftY() > 0.1 || IO.dController.getLeftY() < -0.1) 
         {
         HamsterDrive.arcadeDrive(forwardPower, -turnPower);
         } 
-        else if (Math.abs(IO.dController.getLeftY()) < 0.1 && Math.abs(IO.dController.getRightX()) < 0.1) 
+        else if ( (IO.dController.getLeftY() > -0.1 && IO.dController.getLeftY() < 0.1) && (IO.dController.getRightX() < 0.1 && IO.dController.getRightX() > -0.1) ) 
         {
         stopDrive();
         }
-      } 
+      }
 }

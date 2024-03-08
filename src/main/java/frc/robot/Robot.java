@@ -5,15 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.LED;
 import frc.robot.subsystems.LimeLight;
 import frc.robot.subsystems.Manipulator;
-
-
-
+import java.util.function.DoubleSupplier;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -24,39 +23,22 @@ import frc.robot.subsystems.Manipulator;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  public static LimeLight limelight = new LimeLight();
-  private static Manipulator manipulator = new Manipulator();
-  // private LED led = new LED();
   private DriveTrain drivetrain = new DriveTrain();
-
-  //#AUTOMODE
-  //This function selects which auto to use based on a number input
-  public void autoMode(int autoSelector) 
-  {
-    //Auto #1 will shoot one note, drive forward to grab another, shoot that note, and then leave the starting area
-    //Used for middle position - No limelight
-    if (autoSelector == 1) 
-    {
-      manipulator.autoManipulator(false, true, true, false, false);
-      drivetrain.autoDrive(0.3, 24, 0, 0);
-      manipulator.autoManipulator(true, true, false, false, false);
-      drivetrain.autoDrive(0.3, -24, 0, 0);
-      manipulator.autoManipulator(false, true, true, false, false);
-      drivetrain.autoDrive(0.3, 36, 0, 0);
-    }
-  }
+  private LimeLight limelight = new LimeLight();
+  private Manipulator manipulator = new Manipulator();
+  private DoubleSupplier forward;
+  private DoubleSupplier turn;
+  private DriveCommand dCommand = new DriveCommand(drivetrain, forward, turn);
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
-  public void robotInit() 
-  {
+  public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-   drivetrain.resetDrive();
-   manipulator.initializeManipulator();
-  //  led.initializeLED();
+    drivetrain.resetDrive();
+    manipulator.initializeManipulator();
   }
 
   /**
@@ -67,74 +49,136 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() 
-  {
-
-    drivetrain.HamsterDrive.setSafetyEnabled(false);
-    DriveTrain.encoderMath();
-    manipulator.manipulatorDashboard();
-
+  public void robotPeriodic() {
+    drivetrain.encoderMath();
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    limelight.postValues();
+    manipulator.manipulatorDashboard();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() 
+  {
+    manipulator.initializeManipulator();
+    // dCommand.cancel();
+    drivetrain.resetDrive();
+
+    manipulator.stopSpinUp();
+    manipulator.stopIntake();
+
+    dropTime.stop();
+    dropTime.reset();
+  }
+
+  private boolean segmentFinished = false;
+
+  //#AUTOSEGMENT
+  //This method will perform a segment of an auto program
+  public boolean autoSegment(int ID)
+  {
+    if (ID == 1)
+    {
+      manipulator.intakePosition(5, true);
+      manipulator.spinUp();
+
+      if (dropTime.get() >= 1.7)
+      {
+        manipulator.runIntakeMotor();
+      }
+      if (dropTime.get() >= 2.5)
+      {
+        manipulator.stopIntakeMotor();
+        manipulator.stopSpinUp();
+        segmentFinished = true;
+      }
+    }
+    if (ID == 2)
+    {
+      drivetrain.autoDrive(0.5, 40, 0, 0);
+      manipulator.autoManipulator(true, false, false, false, false);
+      drivetrain.autoDrive(-0.5, 40, 0, 0);
+      manipulator.autoManipulator(false, true, true, false, false);
+      segmentFinished = true;
+    }
+    if (ID == 3)
+    {
+
+    }
+    return segmentFinished;
+  }
+
 
   @Override
   public void disabledPeriodic() {}
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() 
-  {
+  public void autonomousInit() {
+    
 
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) 
-    {
+    if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    limelight.start();
+
+    dropTime.start();
+
+    segmentFinished = false;
   }
 
+  private Timer dropTime = new Timer();
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() 
-  {
-    // autoMode(1);
-    limelight.activateLimelight();
+  public void autonomousPeriodic() {
+    // limelight.runLimelight(drivetrain);
+    
+    if (autoSegment(1)) autoSegment(2);
+
+    // if (manipulator.intakePosition(5))
+    // {
+    //   manipulator.spinUp();
+    //   if (manipulator.shootPosition(5)) manipulator.runIntakeMotor();
+    // }
   }
 
+
+  Timer driveTime = new Timer();
   @Override
-  public void teleopInit() 
-  {
+  public void teleopInit() {
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) 
-    {
+    if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // dCommand.schedule();
+
+
+    driveTime.stop();
+    driveTime.reset();
+    driveTime.start();
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() 
-  {
+  public void teleopPeriodic() {
     drivetrain.drive();
     manipulator.controlManipulator();
-    
-    while (IO.dController.getAButton()) limelight.activateLimelight();
 
+    forward = () -> IO.dController.getLeftY();
+    turn = () -> IO.dController.getRightX();
   }
 
   @Override
-  public void testInit() 
-  {
+  public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
