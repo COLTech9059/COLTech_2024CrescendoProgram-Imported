@@ -263,7 +263,8 @@ public class Manipulator extends SubsystemBase
 
             //Push the digital sensor data to the shuffleboard
             SmartDashboard.putBoolean("Beam Sensor", intakeSensor.get());
-            SmartDashboard.putBoolean("Magnetic Sensor", frontSensor.get());
+            SmartDashboard.putBoolean("Front Sensor", frontSensor.get());
+            SmartDashboard.putBoolean("Back Sensor", backSensor.get());
 
             //Push the encoder values to shuffleboard
             SmartDashboard.putNumber("Manipulator Base Encoder", rightBaseEncoder.getPosition());
