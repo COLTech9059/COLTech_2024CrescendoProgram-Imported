@@ -50,7 +50,8 @@ public class ArmCommand extends Command{
         m_Manipulator.ampPosition(5, ampActive.getAsBoolean());
         m_Manipulator.holdManipulator(holdManipulator.getAsBoolean());
         m_Manipulator.intakePosition(5, intakePosition.getAsBoolean());
-
+        m_Manipulator.ampPosition(5, ampPosition.getAsBoolean());
+        m_Manipulator.shootPosition(5, shootPosition.getAsBoolean());
     }
 
 

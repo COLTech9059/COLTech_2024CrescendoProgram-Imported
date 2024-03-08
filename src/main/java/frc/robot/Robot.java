@@ -171,7 +171,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     drivetrain.drive();
-    manipulator.controlManipulator();
+    // manipulator.controlManipulator();
 
     forward = () -> IO.dController.getLeftY();
     turn = () -> IO.dController.getRightX();

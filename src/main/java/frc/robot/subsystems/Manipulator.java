@@ -178,33 +178,40 @@ public class Manipulator extends SubsystemBase
      * @Param timeout            The time limit for the method
      * @Return didShootPosition  Returns true if successfully positioned, returns false if not
      */
-    public boolean shootPosition(double timeout) 
+    public boolean shootPosition(double timeout, boolean isActive) 
     {
         shootPosTime.reset();
         shootPosTime.start();
 
-        if (shootPosTime.get() <= timeout) 
+        if (isActive)
         {
-            if (rightBaseEncoder.getPosition() < Constants.shootPosition - 2) 
+            if (shootPosTime.get() <= timeout) 
             {
-                rightBaseMotor.set(0.15);
+                if (rightBaseEncoder.getPosition() < Constants.shootPosition - 2) 
+                {
+                    rightBaseMotor.set(0.15);
+                } 
+                else if (rightBaseEncoder.getPosition() > Constants.shootPosition + 1)
+                {
+                    rightBaseMotor.set(-0.2);
+                } 
+                else if (rightBaseEncoder.getPosition() >= Constants.shootPosition - 2 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 1)
+                {
+                    rightBaseMotor.set(0);
+                    didShootPosition = true;
+                    // led.setBoard("green");
+                }
             } 
-            else if (rightBaseEncoder.getPosition() > Constants.shootPosition + 1)
+            else 
             {
-                rightBaseMotor.set(-0.2);
-            } 
-            else if (rightBaseEncoder.getPosition() >= Constants.shootPosition - 2 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 1)
-            {
-                rightBaseMotor.set(0);
-                didShootPosition = true;
-                // led.setBoard("green");
+            rightBaseMotor.set(0);
+            didShootPosition = false;
+            // led.setBoard("red");
             }
-        } 
-        else 
+        }
+        else
         {
-        rightBaseMotor.set(0);
-        didShootPosition = false;
-        // led.setBoard("red");
+            rightBaseMotor.set(0);
         }
         return didShootPosition;
     }
@@ -640,7 +647,7 @@ public class Manipulator extends SubsystemBase
             {
                 if (intakePosition(5, true)) intake(3);
             }
-            if (doesAim) shootPosition(5);
+            if (doesAim) shootPosition(5, true);
             if (doesShoot) shootNote(3);
             if (doesAmpAim) ampPosition(5, true);
             if (doesAmp) ampScore(4);
