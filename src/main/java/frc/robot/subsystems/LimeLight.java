@@ -86,7 +86,7 @@ public class LimeLight extends SubsystemBase
 
 
     public boolean getEnabled(){
-        return enabled;
+        return !enabled;
     }
     
     

@@ -12,8 +12,8 @@ public class RobotContainer {
     private final LimeLight m_LimeLight = new LimeLight();
     private final Manipulator m_Manipulator = new Manipulator();
     //Setup Controller.
-    private final XboxController xbContMovement = new XboxController(0);
-    private final XboxController xbContArm = new XboxController(1);
+    // private final XboxController xbContMovement = new XboxController(0);
+    // private final XboxController xbContArm = new XboxController(1);
     //Autonomous Command.
     private final Command m_autonomousCommand = new Autonomous(m_DriveTrain, m_LimeLight);
 
@@ -24,8 +24,8 @@ public class RobotContainer {
             new DriveCommand
             (
                 m_DriveTrain, 
-                () -> xbContMovement.getLeftY(), 
-                () -> xbContMovement.getRightX()
+                () -> IO.dController.getLeftY(), 
+                () -> IO.dController.getRightX()
             )
         );
 
@@ -34,15 +34,15 @@ public class RobotContainer {
             new ArmCommand
             (
                 m_Manipulator, 
-                () -> (xbContMovement.getRightTriggerAxis() - xbContMovement.getLeftTriggerAxis()), 
-                () -> xbContMovement.getRightBumper(), 
-                () -> xbContMovement.getLeftBumper(),
-                () -> xbContMovement.getAButton(),
-                () -> xbContMovement.getBButton(),
-                () -> xbContArm.getBButton(),
-                () -> xbContArm.getAButton(),
-                () -> xbContArm.getYButton(),
-                () -> xbContArm.getXButton()
+                () -> (IO.dController.getRightTriggerAxis() - IO.dController.getLeftTriggerAxis()), 
+                () -> IO.dController.getRightBumper(), 
+                () -> IO.dController.getLeftBumper(),
+                () -> IO.dController.getAButton(),
+                () -> IO.dController.getBButton(),
+                () -> IO.oController.getBButton(),
+                () -> IO.oController.getAButton(),
+                () -> IO.oController.getYButton(),
+                () -> IO.oController.getXButton()
              )
         );
         //Future possible commands here.

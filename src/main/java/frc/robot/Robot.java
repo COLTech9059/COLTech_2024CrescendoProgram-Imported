@@ -26,9 +26,7 @@ public class Robot extends TimedRobot {
   private DriveTrain drivetrain = new DriveTrain();
   private LimeLight limelight = new LimeLight();
   private Manipulator manipulator = new Manipulator();
-  private DoubleSupplier forward;
-  private DoubleSupplier turn;
-  private DriveCommand dCommand = new DriveCommand(drivetrain, forward, turn);
+  private RobotContainer m_RobotContainer;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -39,6 +37,8 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     drivetrain.resetDrive();
     manipulator.initializeManipulator();
+
+    m_RobotContainer = new RobotContainer();
   }
 
   /**
@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
     limelight.postValues();
     manipulator.manipulatorDashboard();
   }
@@ -173,8 +174,7 @@ public class Robot extends TimedRobot {
     // drivetrain.drive();
     // manipulator.controlManipulator();
 
-    forward = () -> IO.dController.getLeftY();
-    turn = () -> IO.dController.getRightX();
+
   }
 
   @Override
