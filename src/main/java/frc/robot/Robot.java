@@ -24,8 +24,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private DriveTrain drivetrain = new DriveTrain();
-  private LimeLight limelight = new LimeLight();
   private Manipulator manipulator = new Manipulator();
+  private LimeLight limelight = new LimeLight();
+
   private RobotContainer m_RobotContainer;
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -35,10 +36,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    drivetrain.resetDrive();
-    manipulator.initializeManipulator();
+    // m_RobotContainer.m_DriveTrain.resetDrive();
+    // m_RobotContainer.m_Manipulator.initializeManipulator();
 
-    m_RobotContainer = new RobotContainer();
+    m_RobotContainer = new RobotContainer(drivetrain, limelight, manipulator);
   }
 
   /**

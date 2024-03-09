@@ -8,22 +8,26 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class RobotContainer {
     //Subsystem declarations.
-    private final DriveTrain m_DriveTrain = new DriveTrain();
-    private final LimeLight m_LimeLight = new LimeLight();
-    private final Manipulator m_Manipulator = new Manipulator();
+    private final DriveTrain drivetrain;
+    private final LimeLight limelight;
+    private final Manipulator m_Manipulator;
     //Setup Controller.
     // private final XboxController xbContMovement = new XboxController(0);
     // private final XboxController xbContArm = new XboxController(1);
     //Autonomous Command.
-    private final Command m_autonomousCommand = new Autonomous(m_DriveTrain, m_LimeLight);
+    // private final Command m_autonomousCommand = new Autonomous(m_DriveTrain, m_LimeLight);
 
-    public RobotContainer()
+    public RobotContainer(DriveTrain sentDrive, LimeLight sentLime, Manipulator sentManip)
     {
-        m_DriveTrain.setDefaultCommand
+        drivetrain = sentDrive;
+        limelight = sentLime;
+        m_Manipulator = sentManip;
+
+        drivetrain.setDefaultCommand
         (
             new DriveCommand
             (
-                m_DriveTrain, 
+                drivetrain, 
                 () -> IO.dController.getLeftY(), 
                 () -> IO.dController.getRightX()
             )
@@ -56,8 +60,8 @@ public class RobotContainer {
     }
 
     //For getting the autonomous command.
-    public Command getAutoCommand()
-    {
-        return m_autonomousCommand;
-    }
+    // public Command getAutoCommand()
+    // {
+    //     return m_autonomousCommand;
+    // }
 }

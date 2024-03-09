@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.IO;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -147,27 +146,10 @@ public class Manipulator extends SubsystemBase
             // led.setBoard("red");
             }
         }
-        else
-        {
-            rightBaseMotor.set(0);
-        }
         return didIntakePosition;
     }
 
 
-    //#SHOOTPOSITION
-    //This method brings the robot to the shooting position
-    public void shootPosition() 
-    {
-        if (rightBaseEncoder.getPosition() > Constants.shootPosition + 0.5)
-        {
-            rightBaseMotor.set(-0.30);
-        }
-        if (rightBaseEncoder.getPosition() < Constants.shootPosition - 1)
-        {
-            rightBaseMotor.set(0.15);
-        }
-    }
     
     private static Timer shootPosTime = new Timer();
     private boolean didShootPosition = false;
@@ -209,10 +191,6 @@ public class Manipulator extends SubsystemBase
             // led.setBoard("red");
             }
         }
-        else
-        {
-            rightBaseMotor.set(0);
-        }
         return didShootPosition;
     }
 
@@ -235,7 +213,7 @@ public class Manipulator extends SubsystemBase
         {
             if (ampPosTime.get() <= timeout) 
             {
-                if (rightBaseEncoder.getPosition() <= Constants.ampPosition + 1) 
+                if (!backSensor.get()) 
                 {
                     rightBaseMotor.set(-0.3);
                 } 
@@ -252,10 +230,6 @@ public class Manipulator extends SubsystemBase
                 didAmpPosition = false;
                 // led.setBoard("red");
             }
-        }
-        else
-        {
-            rightBaseMotor.set(0);
         }
         return didAmpPosition;
     }
@@ -277,14 +251,19 @@ public class Manipulator extends SubsystemBase
             SmartDashboard.putNumber("Manipulator Base Encoder", rightBaseEncoder.getPosition());
         }
 
-        public void moveArm(double ArmPower){
+        public void moveArm(double ArmPower)
+        {
             rightBaseMotor.set(-ArmPower);
         }
-        public void shootNote(boolean isActive){
+
+        public void shootNote(boolean isActive)
+        {
             if (isActive) ampMotor.set(.5);
             else ampMotor.set(0);
         }
-        public void runIntake(boolean isReverse, boolean isActive){
+
+        public void runIntake(boolean isReverse, boolean isActive)
+        {
             if (!isReverse && isActive) intakeMotor.set(-.4);
             else if (isReverse && !isActive) intakeMotor.set(.2);
             else intakeMotor.set(0);
@@ -298,27 +277,30 @@ public class Manipulator extends SubsystemBase
         /*
          * @Param timeout   The time limit of the method
          */
-        public void intake(double timeout) 
+        public void intake(double timeout, boolean doesIntake) 
         {
             intakeTime.reset();
             intakeTime.start();
 
-            if (intakeTime.get() <= timeout) 
+            if (doesIntake)
             {
-                if (!intakeSensor.get()) 
+                if (intakeTime.get() <= timeout) 
                 {
-                intakeMotor.set(0.4);
+                    if (!intakeSensor.get()) 
+                    {
+                        intakeMotor.set(0.4);
+                    } 
+                    else 
+                    {
+                        intakeMotor.set(0);
+                        didIntake = true;
+                    }
                 } 
                 else 
                 {
-                intakeMotor.set(0);
-                didIntake = true;
+                    intakeMotor.set(0);
+                    didIntake = false;
                 }
-            } 
-            else 
-            {
-            intakeMotor.set(0);
-            didIntake = false;
             }
         }
 
@@ -412,83 +394,32 @@ public class Manipulator extends SubsystemBase
             }
         }
 
-        //#SHOOTNOTE
-        //This method will shoot a note manually
-        public void shootNote() 
-        {
-            ampMotor.set(0.5);
-        }
-
-        //#STOPSHOOT
-        //This method stops the intake and amp motors
-        public void stopShoot() 
-        {
-            ampMotor.set(0);
-        }
 
 
-        private Timer ampTime = new Timer();
-        private static Timer ampTimeout = new Timer();
 
+        private Timer aScoreTimer = new Timer();
         //#AMPSCORE
-        //This method will score a note in the amp
-        /*
-         * @Param timeout   The time limit of the method
-         */
-        public void ampScore(double timeout) 
+        //This method will score in the amp manually
+        public void ampScore(boolean isActive) 
         {
+            aScoreTimer.start();
 
-            ampTimeout.reset();
-            ampTimeout.start();
-            ampTime.reset();
-
-            ampMotor.set(-0.3);
-
-            if (ampTimeout.get() <= timeout) 
+            if (isActive) 
             {
-            //If the beam sensor is active, the intake motor runs in reverse until the beam sensor is deactivated, at
-            //which point the intake motor will stop and the amp motor will run for 1.5 seconds at 40% power to score
-                if (intakeSensor.get()) 
-                {
-                intakeMotor.set(0.3);
-                }
-                else if (!intakeSensor.get()) 
-                {
-                ampTime.start();
-                } 
-                if (!intakeSensor.get() && ampTime.get() >= 1) 
-                {
+                ampMotor.set(-0.3);
+                if (aScoreTimer.get() >= 0.75) intakeMotor.set(0.4);
+            }
+            else 
+            {
                 ampMotor.set(0);
                 intakeMotor.set(0);
-                ampTime.stop(); 
-                }
+
+                aScoreTimer.stop();
+                aScoreTimer.reset();
             }
         }
 
-        //#AMPSCORE
-        //This method will score in the amp manually
-        public void ampScore() 
-        {
-            ampMotor.set(-0.3);
-        }
 
-
-        //#MOVEMANIPULATOR
-        //This method will move the manipulator forward
-        /*
-         * @Param isNegative    Determines if the arm will move in a negative direction or not
-         */
-        public void moveManipulator(boolean isNegative) 
-        {
-            if (!isNegative) 
-            {   
-                rightBaseMotor.set(-0.3);
-            } 
-            else 
-            {
-                rightBaseMotor.set(0.3);
-            }   
-        }
 
         //#MOVEMANIPULATOR
         //This method will move the manipulator forward by a set time
@@ -535,17 +466,6 @@ public class Manipulator extends SubsystemBase
         }
 
 
-        //#RAMPUPMANIPULATOR
-        //This method will increase the movement speed of the manipulator as the trigger is held more
-        /*
-         * @Param power The speed at which the manipulator will move (designed for use with XboxController triggers)
-         */
-        public void rampUpManipulator(double power) 
-        {
-            power *= 0.90;
-            rightBaseMotor.set(power);
-        }
-
 
         // #STOPMANIPULATOR
         //This method stops the manipulator motors
@@ -580,56 +500,16 @@ public class Manipulator extends SubsystemBase
             {
             rightBaseMotor.set(0.1);
             }
+            if (rightBaseEncoder.getPosition() < holdPos + 1.5 && rightBaseEncoder.getPosition() > holdPos - 1.5)
+            {
+                rightBaseMotor.set(0);
+            }
         }
         else
-        {
-            rightBaseMotor.set(0);
+        { 
             setPos = false;
         }
     }
-
-
-        //#CONTROLMANIPULATOR
-        //This method will add keybinds for all the control methods in the manipulator class
-        public void controlManipulator() 
-        {
-            if (IO.dController.getStartButtonPressed()) manualControl();
-            
-            if (usingDigitalSensors) 
-            {
-                if (IO.dController.getRightTriggerAxis() > 0.2) rampUpManipulator(-IO.dController.getRightTriggerAxis());
-                if (IO.dController.getLeftTriggerAxis() > 0.2) rampUpManipulator(IO.dController.getLeftTriggerAxis());
-                if ( ( IO.dController.getLeftTriggerAxis() < 0.2 && IO.dController.getRightTriggerAxis() < 0.2 ) || ( IO.dController.getLeftTriggerAxis() > 0.2 && IO.dController.getRightTriggerAxis() > 0.2 )) stopManipulator();
-                if (!IO.oController.getAButton() && IO.oController.getYButtonPressed() && IO.oController.getXButton() && IO.oController.getBButton()) stopManipulator();
-                // if (IO.oController.getAButton()) holdManipulator();
-                if (IO.dController.getRightBumper()) shootNote();
-                if (IO.dController.getLeftBumper()) intake();
-                if (IO.dController.getAButtonPressed()) reverseIntake();
-                if (IO.dController.getBButton()) ampScore();
-                if (!IO.dController.getRightBumper()) stopShoot();
-                // if (IO.oController.getYButtonPressed()) intakePosition(5);
-                if (IO.oController.getXButton()) shootPosition();
-                if (!IO.dController.getLeftBumper() && !IO.dController.getAButton()) stopIntake();
-                if (IO.oController.getBButton()) 
-                {
-                    if (ampPosition(5, true)) ampScore(4);
-                }
-            } 
-            else 
-            {
-                if (IO.dController.getRightTriggerAxis() > 0.2) rampUpManipulator(-IO.dController.getRightTriggerAxis());
-                if (IO.dController.getLeftTriggerAxis() > 0.2) rampUpManipulator(IO.dController.getLeftTriggerAxis());
-                if ( ( IO.dController.getLeftTriggerAxis() < 0.2 && IO.dController.getRightTriggerAxis() < 0.2 ) || ( IO.dController.getLeftTriggerAxis() > 0.2 && IO.dController.getRightTriggerAxis() > 0.2 )) stopManipulator();
-                // if (IO.oController.getAButton()) holdManipulator();
-                if (IO.dController.getRightBumper()) shootNote();
-                if (IO.dController.getLeftBumper()) intake();
-                if (IO.dController.getAButtonPressed()) reverseIntake();
-                if (IO.dController.getBButton()) ampScore();
-                if (!IO.dController.getRightBumper()) stopShoot();
-                if (!IO.dController.getLeftBumper() && !IO.dController.getAButton()) stopIntake();
-            }
-        }
-
 
 
         //#AUTOMANIPULATOR
@@ -645,11 +525,10 @@ public class Manipulator extends SubsystemBase
         {
             if (doesIntake) 
             {
-                if (intakePosition(5, true)) intake(3);
+                if (intakePosition(5, true)) intake(3, true);
             }
             if (doesAim) shootPosition(5, true);
             if (doesShoot) shootNote(3);
             if (doesAmpAim) ampPosition(5, true);
-            if (doesAmp) ampScore(4);
         }
 }
