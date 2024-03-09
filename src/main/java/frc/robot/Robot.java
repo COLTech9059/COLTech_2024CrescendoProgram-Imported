@@ -21,9 +21,9 @@ import frc.robot.subsystems.Manipulator;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private DriveTrain drivetrain = new DriveTrain();
-  private Manipulator manipulator = new Manipulator();
-  private LimeLight limelight = new LimeLight();
+  private DriveTrain drivetrain;
+  private Manipulator manipulator;
+  private LimeLight limelight;
 
   private RobotContainer m_RobotContainer;
   /**
@@ -36,6 +36,9 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     // m_RobotContainer.m_DriveTrain.resetDrive();
     // m_RobotContainer.m_Manipulator.initializeManipulator();
+    limelight = new LimeLight();
+    manipulator = new Manipulator();
+    drivetrain = new DriveTrain();
 
     m_RobotContainer = new RobotContainer(drivetrain, limelight, manipulator);
   }
@@ -64,10 +67,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() 
   {
-    manipulator.initializeManipulator();
-    // dCommand.cancel();
-    drivetrain.resetDrive();
-
     dropTime.stop();
     dropTime.reset();
   }

@@ -38,11 +38,8 @@ public class Manipulator extends SubsystemBase
 
     private boolean usingDigitalSensors = true;
 
-    //#INITIALIZEMANIPULATOR
-    //This method will set up the manipulator for use
-    public void initializeManipulator() 
+    public Manipulator()
     {
-
         //Reset the digital sensors boolean
         usingDigitalSensors = true;
 
@@ -51,7 +48,7 @@ public class Manipulator extends SubsystemBase
         didShootPosition = false;
 
         //Reset intake boolean
-        // if (!beamSensor.get()) {didIntake = false;} else {didIntake = true;}
+        if (!intakeSensor.get()) {didIntake = false;} else {didIntake = true;}
 
         //Set the followerAmpMotor as a follower
         followerAmpMotor.follow(ampMotor);
@@ -68,8 +65,6 @@ public class Manipulator extends SubsystemBase
 
         rightBaseMotor.setOpenLoopRampRate(0.25);
     }
-
-    
 
     //#manualControl
     //This method toggles the use of digital sensors duting teleop

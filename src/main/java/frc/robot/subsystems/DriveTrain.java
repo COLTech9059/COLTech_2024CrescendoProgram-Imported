@@ -33,7 +33,29 @@ public class DriveTrain extends SubsystemBase
     // Create the differential drive object
     public final DifferentialDrive HamsterDrive = new DifferentialDrive(leftP, rightP);
 
-  public DriveTrain() {}
+  public DriveTrain() 
+  {
+    // Set up the motor controller followers
+    leftF.follow(leftP);
+    rightF.follow(rightP);
+    
+    // Invert the right side motor controller
+    rightP.setInverted(true);
+
+    //Disable the safety feature of the drivetrain, which can be very difficult to work around
+    HamsterDrive.setSafetyEnabled(false);
+
+    // Set deadband for the differential drive
+    HamsterDrive.setDeadband(0.1);
+
+    //Set the encoder positions to zero, effectively resetting them
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+
+    //Set the motors to accelerate and decelerate slower
+    rightP.setOpenLoopRampRate(0.25);
+    leftP.setOpenLoopRampRate(0.25);
+  }
 
   //#STOPDRIVE
   //Method to stop the drive train
@@ -86,40 +108,6 @@ public class DriveTrain extends SubsystemBase
     {
       HamsterDrive.arcadeDrive(0, 0, false);
     }
-  }
-
-  //#RESETDRIVE
-  //This method resets the drive train elements
-  public void resetDrive() 
-  {
-
-    // Reset the factory defaults for the motor controllers
-    // leftP.restoreFactoryDefaults();
-    // rightP.restoreFactoryDefaults();
-    // leftF.restoreFactoryDefaults();
-    // rightF.restoreFactoryDefaults(); 
-
-    // Set up the motor controller followers
-    leftF.follow(leftP);
-    rightF.follow(rightP);
-
-    
-    // Invert the right side motor controller
-    rightP.setInverted(true);
-
-    //Disable the safety feature of the drivetrain, which can be very difficult to work around
-    HamsterDrive.setSafetyEnabled(false);
-
-    // Set deadband for the differential drive
-    HamsterDrive.setDeadband(0.1);
-
-    //Set the encoder positions to zero, effectively resetting them
-    leftEncoder.setPosition(0);
-    rightEncoder.setPosition(0);
-
-    //Set the motors to accelerate and decelerate slower
-    rightP.setOpenLoopRampRate(0.25);
-    leftP.setOpenLoopRampRate(0.25);
   }
 
 

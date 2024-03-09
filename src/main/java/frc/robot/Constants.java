@@ -28,7 +28,7 @@ public final class Constants {
  public static int intakeID = 10;
  
  //Digital inputs DIO ports
- public static int intakeSensorID = 0;
+ public static int intakeSensorID = 3;
  public static int frontSensorID = 1;
  public static int backSensorID = 2;
 
