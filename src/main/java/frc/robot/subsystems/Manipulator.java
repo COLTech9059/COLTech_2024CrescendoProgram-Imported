@@ -255,6 +255,8 @@ public class Manipulator extends SubsystemBase
         // @Param armPower      The percent rotation speed of the motor
         public void moveArm(double ArmPower)
         {
+            if (!frontSensor.get() && -ArmPower < 0) rightBaseMotor.set(0);
+            if (backSensor.get() && -ArmPower > 0) rightBaseMotor.set(0);
             rightBaseMotor.set(-ArmPower);
         }
 
@@ -269,10 +271,10 @@ public class Manipulator extends SubsystemBase
 
         //#SHOOTNOTE
         // @Param isActive      Whether or not the method is doing anything
-        public void shootNote(boolean isActive)
+        public void shootNote(boolean speaker, boolean amp)
         {
             scoreTime.start();
-            if (isActive) 
+            if (speaker) 
             {
                 ampMotor.set(.5);
                 if (scoreTime.get() < 0.75) intakeMotor.set(0);
@@ -283,7 +285,18 @@ public class Manipulator extends SubsystemBase
                     ampMotor.set(0);
                 }
             }
-            else 
+            if (amp) 
+            {
+                ampMotor.set(.3);
+                if (scoreTime.get() < 0.75) intakeMotor.set(0);
+                if (scoreTime.get() >= 0.75 && scoreTime.get() < 1.5) intakeMotor.set(0);
+                if (scoreTime.get() > 1.5)
+                {
+                    intakeMotor.set(0);
+                    ampMotor.set(0);
+                }
+            }
+            if ( (amp && speaker) || (!amp && !speaker))
             {
                 scoreTime.stop();
                 scoreTime.reset();
@@ -378,37 +391,6 @@ public class Manipulator extends SubsystemBase
                 ampMotor.set(0);
                 shootTimer.stop();
                 shootTimer.reset();
-            }
-        }
-
-
-
-        private Timer aScoreTimer = new Timer();
-
-        //#AMPSCORE
-        //This method will score in the amp manually
-        public void ampScore(boolean isActive) 
-        {
-            aScoreTimer.start();
-
-            if (isActive) 
-            {
-                ampMotor.set(-0.3);
-                if (aScoreTimer.get() < 0.75) intakeMotor.set(0);
-                if (aScoreTimer.get() >= 0.75 && aScoreTimer.get() < 1.5) intakeMotor.set(0.4);
-                if (aScoreTimer.get() > 1.5)
-                {
-                    intakeMotor.set(0);
-                    ampMotor.set(0);
-                }
-            }
-            else 
-            {
-                ampMotor.set(0);
-                intakeMotor.set(0);
-
-                aScoreTimer.stop();
-                aScoreTimer.reset();
             }
         }
 
