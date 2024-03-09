@@ -70,49 +70,46 @@ public class Robot extends TimedRobot {
     // dCommand.cancel();
     drivetrain.resetDrive();
 
-    manipulator.stopSpinUp();
-    manipulator.stopIntake();
-
     dropTime.stop();
     dropTime.reset();
   }
 
-  private boolean segmentFinished = false;
+  // private boolean segmentFinished = false;
+  // 
+  // //#AUTOSEGMENT
+  // //This method will perform a segment of an auto program
+  // public boolean autoSegment(int ID)
+  // {
+  //   if (ID == 1)
+  //   {
+  //     manipulator.intakePosition(5, true);
+  //     manipulator.spinUp();
 
-  //#AUTOSEGMENT
-  //This method will perform a segment of an auto program
-  public boolean autoSegment(int ID)
-  {
-    if (ID == 1)
-    {
-      manipulator.intakePosition(5, true);
-      manipulator.spinUp();
+  //     if (dropTime.get() >= 1.7)
+  //     {
+  //       manipulator.runIntakeMotor();
+  //     }
+  //     if (dropTime.get() >= 2.5)
+  //     {
+  //       manipulator.stopIntakeMotor();
+  //       manipulator.stopSpinUp();
+  //       segmentFinished = true;
+  //     }
+  //   }
+  //   if (ID == 2)
+  //   {
+  //     drivetrain.autoDrive(0.5, 40, 0, 0);
+  //     manipulator.autoManipulator(true, false, false, false, false);
+  //     drivetrain.autoDrive(-0.5, 40, 0, 0);
+  //     manipulator.autoManipulator(false, true, true, false, false);
+  //     segmentFinished = true;
+  //   }
+  //   if (ID == 3)
+  //   {
 
-      if (dropTime.get() >= 1.7)
-      {
-        manipulator.runIntakeMotor();
-      }
-      if (dropTime.get() >= 2.5)
-      {
-        manipulator.stopIntakeMotor();
-        manipulator.stopSpinUp();
-        segmentFinished = true;
-      }
-    }
-    if (ID == 2)
-    {
-      drivetrain.autoDrive(0.5, 40, 0, 0);
-      manipulator.autoManipulator(true, false, false, false, false);
-      drivetrain.autoDrive(-0.5, 40, 0, 0);
-      manipulator.autoManipulator(false, true, true, false, false);
-      segmentFinished = true;
-    }
-    if (ID == 3)
-    {
-
-    }
-    return segmentFinished;
-  }
+  //   }
+  //   return segmentFinished;
+  // }
 
 
   @Override
@@ -131,23 +128,13 @@ public class Robot extends TimedRobot {
 
     dropTime.start();
 
-    segmentFinished = false;
+    // segmentFinished = false;
   }
 
   private Timer dropTime = new Timer();
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    // limelight.runLimelight(drivetrain);
-    
-    if (autoSegment(1)) autoSegment(2);
-
-    // if (manipulator.intakePosition(5))
-    // {
-    //   manipulator.spinUp();
-    //   if (manipulator.shootPosition(5)) manipulator.runIntakeMotor();
-    // }
-  }
+  public void autonomousPeriodic() {}
 
 
   Timer driveTime = new Timer();

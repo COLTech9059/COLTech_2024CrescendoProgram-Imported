@@ -53,13 +53,6 @@ public class Manipulator extends SubsystemBase
         //Reset intake boolean
         // if (!beamSensor.get()) {didIntake = false;} else {didIntake = true;}
 
-        //Reset the motors to their factory defaults
-        // leftBaseMotor.restoreFactoryDefaults();
-        // rightBaseMotor.restoreFactoryDefaults();
-        // ampMotor.restoreFactoryDefaults();
-        // followerAmpMotor.restoreFactoryDefaults();
-        // intakeMotor.restoreFactoryDefaults();
-
         //Set the followerAmpMotor as a follower
         followerAmpMotor.follow(ampMotor);
 
@@ -76,26 +69,7 @@ public class Manipulator extends SubsystemBase
         rightBaseMotor.setOpenLoopRampRate(0.25);
     }
 
-
-    public void runIntakeMotor()
-    {
-        intakeMotor.set(0.4);
-    }
-
-    public void stopIntakeMotor()
-    {
-        intakeMotor.set(0);
-    }
-
-    public void spinUp() 
-    {
-        ampMotor.set(0.6);
-    }
-
-    public void stopSpinUp()
-    {
-        ampMotor.set(0);
-    }
+    
 
     //#manualControl
     //This method toggles the use of digital sensors duting teleop
@@ -112,6 +86,7 @@ public class Manipulator extends SubsystemBase
     //This method will run the manipulator base motors until the magnetic sensor is triggered at the amp spitting position
     /*
      * @Param timeout               The time limit for the method
+     * @Param isMoving              Whether or not the method does anything
      * @Return didIntakePosition    Returns true if successfully positioned, and false if not
      */
     
@@ -158,6 +133,7 @@ public class Manipulator extends SubsystemBase
     //This method will bring the manipulator to a position for it to shoot from
     /*
      * @Param timeout            The time limit for the method
+     * @Param isActive           Whether or not the method does anything
      * @Return didShootPosition  Returns true if successfully positioned, returns false if not
      */
     public boolean shootPosition(double timeout, boolean isActive) 
@@ -202,6 +178,7 @@ public class Manipulator extends SubsystemBase
     //This method will bring the manipulator to a position for it to score in the amp
     /*
      * @Param timeout           The time limit for the method
+     * @Param isActive          Whether or not the method does anything
      * @Return didAmpPosition   Returns true if positioned successfully, returns false if not
      */
     public boolean ampPosition(double timeout, boolean isActive) 
@@ -260,17 +237,15 @@ public class Manipulator extends SubsystemBase
             rightBaseMotor.set(-ArmPower);
         }
 
-        //#STOPINTAKE
-        public void stopIntake()
-        {
-            intakeMotor.set(0);
-        }
 
 
         private Timer scoreTime = new Timer();
 
         //#SHOOTNOTE
-        // @Param isActive      Whether or not the method is doing anything
+        /*
+        *@Param speaker      Whether or not the note is shot into the speaker
+        *@Param amp          Whether or not the note is dumped into the amp
+        */
         public void shootNote(boolean speaker, boolean amp)
         {
             scoreTime.start();
@@ -303,12 +278,18 @@ public class Manipulator extends SubsystemBase
             }
         }
 
+        //#RUNINTAKE
+        /*
+         * @Param isReverse     Whether or not the intake motors are reversed
+         * @Param isActive      Whether or not the method does anything
+         */
         public void runIntake(boolean isReverse, boolean isActive)
         {
             if (!isReverse && isActive) intakeMotor.set(-.4);
             else if (isReverse && !isActive) intakeMotor.set(.2);
             else intakeMotor.set(0);
         }
+
 
         public static boolean didIntake = false;
         private static Timer intakeTime = new Timer();
@@ -346,31 +327,9 @@ public class Manipulator extends SubsystemBase
             }
         }
 
-        //#INTAKE
-        //This method will manually intake a note
-        public void intake() 
-        {
-            intakeMotor.set(-0.4);
-        }
 
-        Timer revIntakeTime = new Timer();
 
-        //#REVERSEINTAKE
-        //This method runs the intake backwards for a short time to get the note out of the flywheels
-        public void reverseIntake() 
-        {
-            revIntakeTime.reset();
-            revIntakeTime.start();
-
-            if (revIntakeTime.get() < 0.5) 
-            {
-                intakeMotor.set(0.2);
-            }
-            else
-            {
-                intakeMotor.set(0);
-            }
-        }
+        
 
 
         //#AUTOSHOOT
@@ -441,20 +400,14 @@ public class Manipulator extends SubsystemBase
         }
 
 
-
-        // #STOPMANIPULATOR
-        //This method stops the manipulator motors
-        public void stopManipulator() 
-        {
-            rightBaseMotor.set(0);
-        }
-
         
         boolean setPos = false;
         double holdPos = 0;
 
     //#HOLDMANIPULATOR
-    //This method will try to hold the manipulator in one spot
+    /*
+     *@Param isHolding      Whether or not the method does anything
+     */
     public void holdManipulator(boolean isHolding) 
     {
         
@@ -503,6 +456,8 @@ public class Manipulator extends SubsystemBase
                 if (intakePosition(5, true)) intake(3, true);
             }
             if (doesAim) shootPosition(5, true);
+            if (doesShoot) shootNote(true, false);
             if (doesAmpAim) ampPosition(5, true);
+            if (doesAmp) shootNote(false, true);
         }
 }

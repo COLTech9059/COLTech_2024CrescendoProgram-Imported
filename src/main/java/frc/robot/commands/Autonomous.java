@@ -7,6 +7,6 @@ public class Autonomous extends SequentialCommandGroup {
 
     public Autonomous(DriveTrain dT, LimeLight LL){
         //Add more commands to this list to increase the functionality of Autonomous.
-        addCommands(new LimeLightCommand(LL, dT));
+        // addCommands(new LimeLightCommand(LL, dT));
     }
 }
