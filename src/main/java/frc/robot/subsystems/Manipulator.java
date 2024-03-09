@@ -449,33 +449,7 @@ public class Manipulator extends SubsystemBase
      */
     public void holdManipulator(boolean isHolding) 
     {
-        
-        if (!setPos) 
-        {
-            holdPos = rightBaseEncoder.getPosition();
-            setPos = true;
-        }
-
-        if (isHolding)
-        {
-        
-            if (rightBaseEncoder.getPosition() > holdPos + 1.5)
-            {
-            rightBaseMotor.set(-0.1);
-            }
-            if (rightBaseEncoder.getPosition() < holdPos - 1.5)
-            {
-            rightBaseMotor.set(0.1);
-            }
-            if (rightBaseEncoder.getPosition() < holdPos + 1.5 && rightBaseEncoder.getPosition() > holdPos - 1.5)
-            {
-                rightBaseMotor.set(0);
-            }
-        }
-        else
-        { 
-            setPos = false;
-        }
+        if (isHolding) rightBaseMotor.set(0.05);
     }
 
 

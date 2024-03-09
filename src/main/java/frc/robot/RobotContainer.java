@@ -36,7 +36,7 @@ public class RobotContainer {
             (
                 m_Manipulator, 
                 () -> (IO.dController.getRightTriggerAxis() - IO.dController.getLeftTriggerAxis()), 
-                () -> IO.dController.getRightBumper(), 
+                () -> IO.oController.getRightBumper(), 
                 () -> IO.dController.getLeftBumper(),
                 () -> IO.dController.getAButton(),
                 () -> IO.dController.getBButton(),
