@@ -256,10 +256,32 @@ public class Manipulator extends SubsystemBase
             rightBaseMotor.set(-ArmPower);
         }
 
+        //#STOPINTAKE
+        public void stopIntake()
+        {
+            intakeMotor.set(0);
+        }
+
+
+        private Timer scoreTime = new Timer();
+
+        //#SHOOTNOTE
         public void shootNote(boolean isActive)
         {
-            if (isActive) ampMotor.set(.5);
-            else ampMotor.set(0);
+            scoreTime.start();
+            if (isActive) 
+            {
+                ampMotor.set(.5);
+                if (scoreTime.get() >= 0.75) intakeMotor.set(0.4);
+            }
+            else 
+            {
+                intakeMotor.set(0);
+                ampMotor.set(0);
+
+                scoreTime.stop();
+                scoreTime.reset();
+            }
         }
 
         public void runIntake(boolean isReverse, boolean isActive)
@@ -330,13 +352,9 @@ public class Manipulator extends SubsystemBase
             }
         }
 
-        //#STOPINTAKE
-        //This method halts the intake motors
-        public void stopIntake() 
-        {
-            intakeMotor.set(0);
-        }
 
+        //#AUTOSHOOT
+        //
         private Timer shootTimer = new Timer();
         public void autoShoot(double shootTime)
         {
