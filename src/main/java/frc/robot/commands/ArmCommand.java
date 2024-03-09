@@ -47,12 +47,13 @@ public class ArmCommand extends Command{
     {
         //Move arm based on power
         m_Manipulator.moveArm(ArmPower.getAsDouble());
-        m_Manipulator.shootNote(shootEnabled.getAsBoolean(), ampActive.getAsBoolean());
-        m_Manipulator.runIntake(canReverseIntake.getAsBoolean(), intakeActive.getAsBoolean());
+        m_Manipulator.shootNote(shootEnabled.getAsBoolean());
+        m_Manipulator.ampScore(ampActive.getAsBoolean());
+        m_Manipulator.intake(2, intakeActive.getAsBoolean());
         m_Manipulator.holdManipulator(holdManipulator.getAsBoolean());
-        m_Manipulator.intakePosition(5, intakePosition.getAsBoolean());
-        m_Manipulator.ampPosition(5, ampPosition.getAsBoolean());
-        m_Manipulator.shootPosition(5, shootPosition.getAsBoolean());
+        m_Manipulator.intakePosition(3, intakePosition.getAsBoolean());
+        m_Manipulator.ampPosition(3, ampPosition.getAsBoolean());
+        m_Manipulator.shootPosition(3, shootPosition.getAsBoolean());
 
         SmartDashboard.putNumber("ArmPower", ArmPower.getAsDouble());
     }

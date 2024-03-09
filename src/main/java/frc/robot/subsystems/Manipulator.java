@@ -66,13 +66,20 @@ public class Manipulator extends SubsystemBase
         rightBaseMotor.setOpenLoopRampRate(0.25);
     }
 
-    //#manualControl
+    //#MANUALCONTROL
     //This method toggles the use of digital sensors duting teleop
     public void manualControl() 
     {
         if (usingDigitalSensors) {usingDigitalSensors = false;} else {usingDigitalSensors = true;}
     }
 
+
+    //#RESETENCODERS
+    //This method resets the encoder values to 0
+    public void resetEncoders()
+    {
+        rightBaseEncoder.setPosition(0);
+    }
     
     private static boolean didIntakePosition = false;
     private static Timer posTimer = new Timer();
@@ -85,14 +92,17 @@ public class Manipulator extends SubsystemBase
      * @Return didIntakePosition    Returns true if successfully positioned, and false if not
      */
     
+     private boolean intakePosEnabled = false;
+
     public boolean intakePosition(double timeout, boolean isMoving) 
     {
-        posTimer.reset();
-        posTimer.start();
+        
 
-        if (isMoving)
+        if (isMoving) {posTimer.start(); intakePosEnabled = true;}
+
+        if (intakePosEnabled)
         {
-            if (posTimer.get() <= timeout) 
+            if (posTimer.get() <= timeout && posTimer.get() > 0) 
             {
                 if (intakeSensor.get()) 
                 {
@@ -100,6 +110,8 @@ public class Manipulator extends SubsystemBase
                 } 
                 else if (!intakeSensor.get()) 
                 {
+                    intakePosEnabled = false;
+
                 rightBaseMotor.set(0);
                 rightBaseEncoder.setPosition(0);
 
@@ -111,6 +123,8 @@ public class Manipulator extends SubsystemBase
             } 
             else 
             {
+                intakePosEnabled = false;
+
             rightBaseMotor.set(0);
             didIntakePosition = false;
             // led.setBoard("red");
@@ -131,14 +145,16 @@ public class Manipulator extends SubsystemBase
      * @Param isActive           Whether or not the method does anything
      * @Return didShootPosition  Returns true if successfully positioned, returns false if not
      */
+
+     private boolean shootPosEnabled;
+
     public boolean shootPosition(double timeout, boolean isActive) 
     {
-        shootPosTime.reset();
-        shootPosTime.start();
-
-        if (isActive)
+        if (isActive) {shootPosTime.start(); shootPosEnabled = true;}
+        
+        if (shootPosEnabled)
         {
-            if (shootPosTime.get() <= timeout) 
+            if (shootPosTime.get() <= timeout && shootPosTime.get() > 0) 
             {
                 if (rightBaseEncoder.getPosition() < Constants.shootPosition - 2) 
                 {
@@ -150,6 +166,7 @@ public class Manipulator extends SubsystemBase
                 } 
                 else if (rightBaseEncoder.getPosition() >= Constants.shootPosition - 2 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 1)
                 {
+                    shootPosEnabled = false;
                     rightBaseMotor.set(0);
                     didShootPosition = true;
                     // led.setBoard("green");
@@ -157,9 +174,10 @@ public class Manipulator extends SubsystemBase
             } 
             else 
             {
-            rightBaseMotor.set(0);
-            didShootPosition = false;
-            // led.setBoard("red");
+                shootPosEnabled = false;
+                rightBaseMotor.set(0);
+                didShootPosition = false;
+                // led.setBoard("red");
             }
         }
         return didShootPosition;
@@ -176,14 +194,16 @@ public class Manipulator extends SubsystemBase
      * @Param isActive          Whether or not the method does anything
      * @Return didAmpPosition   Returns true if positioned successfully, returns false if not
      */
+
+     private boolean ampPosEnabled = false;
+
     public boolean ampPosition(double timeout, boolean isActive) 
     {
-        ampPosTime.reset();
-        ampPosTime.start();
-
-        if (isActive)
+        if (isActive) {ampPosTime.start(); ampPosEnabled = true;}
+        
+        if (ampPosEnabled) 
         {
-            if (ampPosTime.get() <= timeout) 
+            if (ampPosTime.get() <= timeout && ampPosTime.get() > 0) 
             {
                 if (!backSensor.get()) 
                 {
@@ -191,6 +211,7 @@ public class Manipulator extends SubsystemBase
                 } 
                 else 
                 {
+                    ampPosEnabled = false;
                     rightBaseMotor.set(0);
                     didAmpPosition = true;
                     // led.setBoard("green");
@@ -198,6 +219,7 @@ public class Manipulator extends SubsystemBase
             } 
             else 
             {
+                ampPosEnabled = false;
                 rightBaseMotor.set(0);
                 didAmpPosition = false;
                 // led.setBoard("red");
@@ -238,40 +260,53 @@ public class Manipulator extends SubsystemBase
 
         //#SHOOTNOTE
         /*
-        *@Param speaker      Whether or not the note is shot into the speaker
-        *@Param amp          Whether or not the note is dumped into the amp
+        *@Param isActive      Whether or not the method does anything
         */
-        public void shootNote(boolean speaker, boolean amp)
+        public void shootNote(boolean isActive)
         {
-            scoreTime.start();
-            if (speaker) 
+            if (isActive)
             {
-                ampMotor.set(.5);
-                if (scoreTime.get() < 0.75) intakeMotor.set(0);
-                if (scoreTime.get() >= 0.75 && scoreTime.get() < 1.5) intakeMotor.set(0);
-                if (scoreTime.get() > 1.5)
+                scoreTime.start();
+                ampMotor.set(0.5);
+            } 
+                if (scoreTime.get() < 0.3 && scoreTime.get() > 0) intakeMotor.set(0);
+                if (scoreTime.get() >= 0.3 && scoreTime.get() < 0.75) intakeMotor.set(-0.4);
+                if (scoreTime.get() > 0.75)
                 {
                     intakeMotor.set(0);
                     ampMotor.set(0);
+
+                    scoreTime.stop();
+                    scoreTime.reset();
                 }
-            }
-            if (amp) 
-            {
-                ampMotor.set(.3);
-                if (scoreTime.get() < 0.75) intakeMotor.set(0);
-                if (scoreTime.get() >= 0.75 && scoreTime.get() < 1.5) intakeMotor.set(0);
-                if (scoreTime.get() > 1.5)
-                {
-                    intakeMotor.set(0);
-                    ampMotor.set(0);
-                }
-            }
-            if ( (amp && speaker) || (!amp && !speaker))
-            {
-                scoreTime.stop();
-                scoreTime.reset();
-            }
         }
+
+
+        private Timer aScoreTime = new Timer();
+
+        //#AMPSCORE
+        /*
+         * @Param isActive      Whether or not the method does anything
+         */
+        public void ampScore(boolean isActive)
+        {
+            if (isActive)
+            {
+                aScoreTime.start();
+                ampMotor.set(0.3);
+            } 
+                if (aScoreTime.get() < 0.3 && aScoreTime.get() > 0) intakeMotor.set(0);
+                if (aScoreTime.get() >= 0.3 && aScoreTime.get() < 0.75) intakeMotor.set(-0.4);
+                if (aScoreTime.get() > 0.75)
+                {
+                    intakeMotor.set(0);
+                    ampMotor.set(0);
+
+                    aScoreTime.stop();
+                    aScoreTime.reset();
+                }
+        }
+
 
         //#RUNINTAKE
         /*
@@ -295,31 +330,40 @@ public class Manipulator extends SubsystemBase
          * @Param timeout       The time limit of the method
          * @Param doesIntake    Whether or not the method does anything
          */
+        private boolean enabled;
         public void intake(double timeout, boolean doesIntake) 
         {
-            intakeTime.reset();
-            intakeTime.start();
+            if (doesIntake) {intakeTime.start(); enabled = true;}
 
-            if (doesIntake)
+            if (enabled)
             {
-                if (intakeTime.get() <= timeout) 
+                if (intakeTime.get() <= timeout && intakeTime.get() > 0) 
                 {
                     if (!intakeSensor.get()) 
                     {
-                        intakeMotor.set(0.4);
+                        intakeMotor.set(-0.4);
                     } 
-                    else 
+                    else
                     {
                         intakeMotor.set(0);
                         didIntake = true;
+                        enabled = false;
+
+                        intakeTime.stop();
+                        intakeTime.reset();
                     }
                 } 
                 else 
                 {
                     intakeMotor.set(0);
                     didIntake = false;
+                    enabled = false;
+
+                    intakeTime.stop();
+                    intakeTime.reset();
                 }
             }
+           
         }
 
 
@@ -451,8 +495,8 @@ public class Manipulator extends SubsystemBase
                 if (intakePosition(5, true)) intake(3, true);
             }
             if (doesAim) shootPosition(5, true);
-            if (doesShoot) shootNote(true, false);
+            if (doesShoot) shootNote(true);
             if (doesAmpAim) ampPosition(5, true);
-            if (doesAmp) shootNote(false, true);
+            if (doesAmp) ampScore(true);
         }
 }

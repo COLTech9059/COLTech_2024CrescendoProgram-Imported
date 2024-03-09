@@ -67,6 +67,8 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() 
   {
+    manipulator.resetEncoders();
+
     dropTime.stop();
     dropTime.reset();
   }
