@@ -12,9 +12,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.IO;
-import frc.robot.Robot;
 
 
 public class DriveTrain extends SubsystemBase 
@@ -35,8 +32,6 @@ public class DriveTrain extends SubsystemBase
   
     // Create the differential drive object
     public final DifferentialDrive HamsterDrive = new DifferentialDrive(leftP, rightP);
-
-    double forwardPower;
 
   public DriveTrain() {}
 
@@ -137,7 +132,7 @@ public class DriveTrain extends SubsystemBase
 
       //#ENCODERMATH
       //This fucntion handles all of the math and data necessary to use the encoders
-      public static void encoderMath() 
+      public void encoderMath() 
       {
         //All the math to convert encoder rotations to horizontal distance in inches
         rightWheelRotations = rightEncoder.getPosition() / 8.45;
@@ -149,39 +144,5 @@ public class DriveTrain extends SubsystemBase
         // Displays the Left and Right encoder rates on the dashboard with the specified names
         SmartDashboard.putNumber("Left Encoder Distance", leftDistance);
         SmartDashboard.putNumber("Right Encoder Distance", rightDistance);
-      }
-
-
-
-      //#DRIVE
-      //This method determines what to do with the motors based on the controller input
-      public void drive() 
-      {
-        // Get the value of the Y-Axis on the joystick
-        double forward = IO.dController.getLeftY();
-
-        // Adjust Speed/Power so that it will always be at a max of 80%
-        double change = 0;
-
-        if (forward < 0) change = 0.1;
-        if (forward > 0) change = -0.1;
-
-        forwardPower = forward + change;
-
-        // Set turn to the value of the X-Axis on the joystick
-        double turn = IO.dController.getRightX();
-
-        // Reduce Turn Power
-        double turnPower = turn *= 0.8;
-
-        // Drive the Robot with <forwardPower> and <turnPower>
-        if (IO.dController.getRightX() > 0.1 || IO.dController.getRightX() < -0.1 || IO.dController.getLeftY() > 0.1 || IO.dController.getLeftY() < -0.1) 
-        {
-        HamsterDrive.arcadeDrive(forwardPower, -turnPower);
-        } 
-        else if ( (IO.dController.getLeftY() > -0.1 && IO.dController.getLeftY() < 0.1) && (IO.dController.getRightX() < 0.1 && IO.dController.getRightX() > -0.1) ) 
-        {
-        stopDrive();
-        }
       }
 }
