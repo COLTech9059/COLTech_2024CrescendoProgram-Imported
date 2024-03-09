@@ -251,6 +251,8 @@ public class Manipulator extends SubsystemBase
             SmartDashboard.putNumber("Manipulator Base Encoder", rightBaseEncoder.getPosition());
         }
 
+        //#ARMPOWER
+        // @Param armPower      The percent rotation speed of the motor
         public void moveArm(double ArmPower)
         {
             rightBaseMotor.set(-ArmPower);
@@ -266,19 +268,23 @@ public class Manipulator extends SubsystemBase
         private Timer scoreTime = new Timer();
 
         //#SHOOTNOTE
+        // @Param isActive      Whether or not the method is doing anything
         public void shootNote(boolean isActive)
         {
             scoreTime.start();
             if (isActive) 
             {
                 ampMotor.set(.5);
-                if (scoreTime.get() >= 0.75) intakeMotor.set(0.4);
+                if (scoreTime.get() < 0.75) intakeMotor.set(0);
+                if (scoreTime.get() >= 0.75 && scoreTime.get() < 1.5) intakeMotor.set(0);
+                if (scoreTime.get() > 1.5)
+                {
+                    intakeMotor.set(0);
+                    ampMotor.set(0);
+                }
             }
             else 
             {
-                intakeMotor.set(0);
-                ampMotor.set(0);
-
                 scoreTime.stop();
                 scoreTime.reset();
             }
@@ -297,7 +303,8 @@ public class Manipulator extends SubsystemBase
         //#INTAKE
         //This method will intake a note
         /*
-         * @Param timeout   The time limit of the method
+         * @Param timeout       The time limit of the method
+         * @Param doesIntake    Whether or not the method does anything
          */
         public void intake(double timeout, boolean doesIntake) 
         {
@@ -354,7 +361,7 @@ public class Manipulator extends SubsystemBase
 
 
         //#AUTOSHOOT
-        //
+        //@Param shootTime      The duration for which the motors will run
         private Timer shootTimer = new Timer();
         public void autoShoot(double shootTime)
         {
@@ -374,48 +381,10 @@ public class Manipulator extends SubsystemBase
             }
         }
 
-        private Timer shootTime = new Timer();
-        private static Timer shootTimeout = new Timer();
-
-        //#SHOOTNOTE
-        //This method will shoot a note
-        /*
-         * @Param timeout   The time limit of the method
-         */
-        public void shootNote(double timeout) 
-        {
-
-            shootTimeout.reset();
-            shootTimeout.start();
-            shootTime.reset();
-
-            ampMotor.set(-0.6);
-            
-            if (shootTimeout.get() <= timeout) 
-            {
-            //If the beam sensor is active, the intake motor runs in reverse until the beam sensor is deactivated,
-            //at which point the intake motor will stop and the amp motor will run for 1 second at full power to shoot
-                if (intakeSensor.get()) 
-                {
-                    intakeMotor.set(0.3);
-                } 
-                else if (!intakeSensor.get()) 
-                {
-                    shootTime.start();
-                } 
-                if (!intakeSensor.get() && shootTime.get() >= 1) 
-                {
-                    intakeMotor.set(0);
-                    ampMotor.set(0);
-                    shootTime.stop();
-                }
-            }
-        }
-
-
 
 
         private Timer aScoreTimer = new Timer();
+
         //#AMPSCORE
         //This method will score in the amp manually
         public void ampScore(boolean isActive) 
@@ -425,7 +394,13 @@ public class Manipulator extends SubsystemBase
             if (isActive) 
             {
                 ampMotor.set(-0.3);
-                if (aScoreTimer.get() >= 0.75) intakeMotor.set(0.4);
+                if (aScoreTimer.get() < 0.75) intakeMotor.set(0);
+                if (aScoreTimer.get() >= 0.75 && aScoreTimer.get() < 1.5) intakeMotor.set(0.4);
+                if (aScoreTimer.get() > 1.5)
+                {
+                    intakeMotor.set(0);
+                    ampMotor.set(0);
+                }
             }
             else 
             {
@@ -546,7 +521,6 @@ public class Manipulator extends SubsystemBase
                 if (intakePosition(5, true)) intake(3, true);
             }
             if (doesAim) shootPosition(5, true);
-            if (doesShoot) shootNote(3);
             if (doesAmpAim) ampPosition(5, true);
         }
 }
