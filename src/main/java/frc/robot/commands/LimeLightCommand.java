@@ -13,6 +13,9 @@ public class LimeLightCommand extends Command{
         limelight = newLime;
         drivetrain = newDrive;
         addRequirements(limelight, drivetrain);
+    }
+    @Override
+    public void initialize(){
         limelight.start();
     }
     //# EXECUTE
@@ -28,4 +31,10 @@ public class LimeLightCommand extends Command{
     public boolean isFinished(){
         return limelight.getEnabled();
     }
+
+    @Override
+    public void end(boolean interrupted){
+        limelight.stop();
+    }
+
 }

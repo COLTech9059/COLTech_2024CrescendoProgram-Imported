@@ -96,19 +96,17 @@ public class Manipulator extends SubsystemBase
 
     public boolean intakePosition(double timeout, boolean isMoving) 
     {
-        
-
         if (isMoving) {posTimer.start(); intakePosEnabled = true;}
 
         if (intakePosEnabled)
         {
             if (posTimer.get() <= timeout && posTimer.get() > 0) 
             {
-                if (intakeSensor.get()) 
+                if (frontSensor.get()) 
                 {
-                rightBaseMotor.set(0.3);
+                rightBaseMotor.set(0.4);
                 } 
-                else if (!intakeSensor.get()) 
+                else if (!frontSensor.get()) 
                 {
                     intakePosEnabled = false;
 
@@ -123,10 +121,13 @@ public class Manipulator extends SubsystemBase
             } 
             else 
             {
-                intakePosEnabled = false;
+            intakePosEnabled = false;
 
             rightBaseMotor.set(0);
             didIntakePosition = false;
+
+            posTimer.stop();
+            posTimer.reset();
             // led.setBoard("red");
             }
         }
@@ -156,19 +157,22 @@ public class Manipulator extends SubsystemBase
         {
             if (shootPosTime.get() <= timeout && shootPosTime.get() > 0) 
             {
-                if (rightBaseEncoder.getPosition() < Constants.shootPosition - 2) 
+                if (rightBaseEncoder.getPosition() < Constants.shootPosition - 1) 
                 {
-                    rightBaseMotor.set(0.15);
+                    rightBaseMotor.set(0.4);
                 } 
-                else if (rightBaseEncoder.getPosition() > Constants.shootPosition + 1)
+                else if (rightBaseEncoder.getPosition() > Constants.shootPosition + 0.5)
                 {
-                    rightBaseMotor.set(-0.2);
+                    rightBaseMotor.set(-0.4);
                 } 
-                else if (rightBaseEncoder.getPosition() >= Constants.shootPosition - 2 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 1)
+                else if (rightBaseEncoder.getPosition() >= Constants.shootPosition - 1 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 0.5)
                 {
                     shootPosEnabled = false;
                     rightBaseMotor.set(0);
                     didShootPosition = true;
+
+                    shootPosTime.stop();
+                    shootPosTime.reset();
                     // led.setBoard("green");
                 }
             } 
@@ -177,6 +181,9 @@ public class Manipulator extends SubsystemBase
                 shootPosEnabled = false;
                 rightBaseMotor.set(0);
                 didShootPosition = false;
+
+                shootPosTime.stop();
+                shootPosTime.reset();
                 // led.setBoard("red");
             }
         }
@@ -207,13 +214,17 @@ public class Manipulator extends SubsystemBase
             {
                 if (!backSensor.get()) 
                 {
-                    rightBaseMotor.set(-0.3);
+                    rightBaseMotor.set(-0.5);
                 } 
                 else 
                 {
                     ampPosEnabled = false;
                     rightBaseMotor.set(0);
                     didAmpPosition = true;
+                    rightBaseEncoder.setPosition(-95 + 20);
+
+                    ampPosTime.stop();
+                    ampPosTime.reset();
                     // led.setBoard("green");
                 }
             } 
@@ -222,6 +233,9 @@ public class Manipulator extends SubsystemBase
                 ampPosEnabled = false;
                 rightBaseMotor.set(0);
                 didAmpPosition = false;
+
+                ampPosTime.stop();
+                ampPosTime.reset();
                 // led.setBoard("red");
             }
         }
@@ -449,7 +463,7 @@ public class Manipulator extends SubsystemBase
      */
     public void holdManipulator(boolean isHolding) 
     {
-        if (isHolding) rightBaseMotor.set(0.05);
+        if (isHolding) rightBaseMotor.set(-0.03);
     }
 
 

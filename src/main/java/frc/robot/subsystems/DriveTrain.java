@@ -21,14 +21,14 @@ public class DriveTrain extends SubsystemBase
     // private Robot robot = new Robot();
 
     //create motor controller objects
-    private static CANSparkMax leftP = new CANSparkMax(2, MotorType.kBrushless);
-    private static CANSparkMax rightP = new CANSparkMax(3, MotorType.kBrushless);
-    private static CANSparkMax leftF = new CANSparkMax(4, MotorType.kBrushless);
-    private static CANSparkMax rightF = new CANSparkMax(5, MotorType.kBrushless);
+    private CANSparkMax leftP = new CANSparkMax(2, MotorType.kBrushless);
+    private CANSparkMax rightP = new CANSparkMax(3, MotorType.kBrushless);
+    private CANSparkMax leftF = new CANSparkMax(4, MotorType.kBrushless);
+    private CANSparkMax rightF = new CANSparkMax(5, MotorType.kBrushless);
   
     //create encoder objects
-    static RelativeEncoder leftEncoder = leftP.getEncoder();
-    static RelativeEncoder rightEncoder = rightP.getEncoder();
+    public RelativeEncoder leftEncoder = leftP.getEncoder();
+    public RelativeEncoder rightEncoder = rightP.getEncoder();
   
     // Create the differential drive object
     public final DifferentialDrive HamsterDrive = new DifferentialDrive(leftP, rightP);

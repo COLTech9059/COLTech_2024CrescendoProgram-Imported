@@ -39,7 +39,7 @@ public class RobotContainer {
                 () -> IO.oController.getRightBumper(), 
                 () -> IO.dController.getLeftBumper(),
                 () -> IO.dController.getAButton(),
-                () -> IO.dController.getBButton(),
+                () -> IO.oController.getLeftBumper(),
                 () -> IO.oController.getBButton(),
                 () -> IO.oController.getAButton(),
                 () -> IO.oController.getYButton(),
