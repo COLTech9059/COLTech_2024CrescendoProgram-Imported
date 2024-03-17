@@ -53,8 +53,8 @@ public class DriveTrain extends SubsystemBase
     rightEncoder.setPosition(0);
 
     //Set the motors to accelerate and decelerate slower
-    rightP.setOpenLoopRampRate(0.25);
-    leftP.setOpenLoopRampRate(0.25);
+    rightP.setOpenLoopRampRate(0.2);
+    leftP.setOpenLoopRampRate(0.2);
   }
 
   //#STOPDRIVE
@@ -64,12 +64,16 @@ public class DriveTrain extends SubsystemBase
     HamsterDrive.arcadeDrive(0, 0, false);
   }
 
-
   Timer turnTimer = new Timer();
 
   public void drive(double forwardPow, double turnPow) 
   {
     HamsterDrive.arcadeDrive(forwardPow *.9, turnPow *-.8, false);
+  }
+
+  @Override
+  public void periodic(){
+    encoderMath();
   }
 
   //#AUTODRIVE

@@ -33,8 +33,10 @@ public final class Constants {
  public static int backSensorID = 2;
 
  //Miscellaneus manipulator values
- public static double shootPosition = -10.5;
+ //original value: -10.5
+ public static double shootPosition = -15.5;
  public static double ampPosition = -30;
+ public static double drivePosition = -25;
  
  //LED port (PWM)
  public static int ledPort = 0;

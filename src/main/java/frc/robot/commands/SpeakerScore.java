@@ -12,6 +12,7 @@ public class SpeakerScore extends Command{
     private final boolean enableArm;
     private final boolean armDirection;
     private boolean Completed = false;
+    
     public SpeakerScore(Manipulator manip, boolean enableArm, boolean armDirection, double start, double end){
         m_Manipulator = manip;
         startTime = start;
@@ -26,7 +27,7 @@ public class SpeakerScore extends Command{
         double directionMultiplier = -1;
         if (armDirection) directionMultiplier = 1;
         if (enableArm) m_Manipulator.moveArm(-.3 * directionMultiplier);
-        m_Manipulator.shootNote(true);
+        m_Manipulator.revUpFlywheel(true);
         moveTime.start();
     }
     @Override
@@ -38,7 +39,7 @@ public class SpeakerScore extends Command{
         if (moveTime.get() >= endTime)
         {
             m_Manipulator.runIntake(false, false);
-            m_Manipulator.shootNote(false);
+            m_Manipulator.revUpFlywheel(false);
             Completed = true;
         }
     }
@@ -49,7 +50,7 @@ public class SpeakerScore extends Command{
     @Override
     public void end(boolean interrupted){
         Completed = false;
-        m_Manipulator.shootNote(false);
+        m_Manipulator.revUpFlywheel(false);
         m_Manipulator.runIntake(false, false);
         m_Manipulator.moveArm(0.0);
 

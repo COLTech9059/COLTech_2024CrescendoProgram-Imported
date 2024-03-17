@@ -23,7 +23,7 @@ public class Manipulator extends SubsystemBase
     CANSparkMax followerAmpMotor = new CANSparkMax(Constants.ampFollowID, MotorType.kBrushless);
 
     //Create the encoder objects
-    // RelativeEncoder leftBaseEncoder = leftBaseMotor.getEncoder();
+    RelativeEncoder leftBaseEncoder = leftBaseMotor.getEncoder();
     RelativeEncoder rightBaseEncoder = rightBaseMotor.getEncoder();
     RelativeEncoder ampEncoder = ampMotor.getEncoder();
     RelativeEncoder followerAmpEncoder = followerAmpMotor.getEncoder();
@@ -33,8 +33,8 @@ public class Manipulator extends SubsystemBase
     static DigitalInput intakeSensor = new DigitalInput(Constants.intakeSensorID);
 
     //Reading true = Sensor not triggered, reading false = Sensor is triggered
-    DigitalInput frontSensor = new DigitalInput(Constants.frontSensorID); 
-    DigitalInput backSensor = new DigitalInput(Constants.backSensorID);
+    public DigitalInput frontSensor = new DigitalInput(Constants.frontSensorID); 
+    public DigitalInput backSensor = new DigitalInput(Constants.backSensorID);
 
     private boolean usingDigitalSensors = true;
 
@@ -43,12 +43,12 @@ public class Manipulator extends SubsystemBase
         //Reset the digital sensors boolean
         usingDigitalSensors = true;
 
-        didIntakePosition = false;
-        didAmpPosition = false;
-        didShootPosition = false;
+        // didIntakePosition = false;
+        // didAmpPosition = false;
+        // didShootPosition = false;
 
         //Reset intake boolean
-        if (!intakeSensor.get()) {didIntake = false;} else {didIntake = true;}
+        // if (!intakeSensor.get()) {didIntake = false;} else {didIntake = true;}
 
         //Set the followerAmpMotor as a follower
         followerAmpMotor.follow(ampMotor);
@@ -57,13 +57,9 @@ public class Manipulator extends SubsystemBase
         leftBaseMotor.follow(rightBaseMotor);
 
         //Set the encoders to 0, effectively resetting them
-        // leftBaseEncoder.setPosition(0);
-        rightBaseEncoder.setPosition(0);
-        ampEncoder.setPosition(0);
-        rightIntakeEncoder.setPosition(0);
-        followerAmpEncoder.setPosition(0);
+        resetEncoders();
 
-        rightBaseMotor.setOpenLoopRampRate(0.25);
+        // rightBaseMotor.setOpenLoopRampRate(0.275);
     }
 
     //#MANUALCONTROL
@@ -73,17 +69,38 @@ public class Manipulator extends SubsystemBase
         if (usingDigitalSensors) {usingDigitalSensors = false;} else {usingDigitalSensors = true;}
     }
 
+    //Encoder Methods
 
     //#RESETENCODERS
     //This method resets the encoder values to 0
     public void resetEncoders()
     {
         rightBaseEncoder.setPosition(0);
+        leftBaseEncoder.setPosition(0);
+        ampEncoder.setPosition(0);
+        rightIntakeEncoder.setPosition(0);
+        followerAmpEncoder.setPosition(0);
     }
-    
-    private static boolean didIntakePosition = false;
-    private static Timer posTimer = new Timer();
 
+    //#GETARMAVERAGE
+    //Returns the average between the two arm motors, hopefully giving a more accurate value.
+    public double GetArmAverage()
+    {
+        return (rightBaseEncoder.getPosition() + leftBaseEncoder.getPosition()) / 2;
+    }
+
+    //#SETARMENCODERS
+    //Sets both arm encoders to the same value
+    public void setArmEncoders(double value)
+    {
+        rightBaseEncoder.setPosition(value);
+        leftBaseEncoder.setPosition(value);
+    }
+
+    //Position Methods
+
+    //Variables associated:
+    private static Timer posTimer = new Timer();
     //#INTAKEPOSITION
     //This method will run the manipulator base motors until the magnetic sensor is triggered at the amp spitting position
     /*
@@ -91,54 +108,43 @@ public class Manipulator extends SubsystemBase
      * @Param isMoving              Whether or not the method does anything
      * @Return didIntakePosition    Returns true if successfully positioned, and false if not
      */
-    
-     private boolean intakePosEnabled = false;
-
     public boolean intakePosition(double timeout, boolean isMoving) 
     {
-        if (isMoving) {posTimer.start(); intakePosEnabled = true;}
+        if (isMoving) {posTimer.start(); canHold = false;}
 
-        if (intakePosEnabled)
+        if (posTimer.get() > 0)
         {
-            if (posTimer.get() <= timeout && posTimer.get() > 0) 
+            if (posTimer.get() <= timeout) 
             {
-                if (frontSensor.get()) 
+                //Check to see if the front sensor changed
+                if (!frontSensor.get()) 
                 {
-                rightBaseMotor.set(0.4);
-                } 
-                else if (!frontSensor.get()) 
-                {
-                    intakePosEnabled = false;
+                    rightBaseMotor.set(0);
+                    resetEncoders();
+                    // led.setBoard("green");
+                    posTimer.stop();
+                    posTimer.reset();
 
+                    return true;
+                }
+                //Continue moving the arm until the above statement is satisfied.
+               rightBaseMotor.set(0.5);
+            } 
+            else
+            {
                 rightBaseMotor.set(0);
-                rightBaseEncoder.setPosition(0);
 
-                didIntakePosition = true;
-                // led.setBoard("green");
                 posTimer.stop();
                 posTimer.reset();
-                }
-            } 
-            else 
-            {
-            intakePosEnabled = false;
-
-            rightBaseMotor.set(0);
-            didIntakePosition = false;
-
-            posTimer.stop();
-            posTimer.reset();
-            // led.setBoard("red");
+                // led.setBoard("red");
             }
         }
-        return didIntakePosition;
+        return false;
     }
 
 
-    
+    //Variables associated:
     private static Timer shootPosTime = new Timer();
-    private boolean didShootPosition = false;
-
     //#SHOOTPOSITION
     //This method will bring the manipulator to a position for it to shoot from
     /*
@@ -146,54 +152,48 @@ public class Manipulator extends SubsystemBase
      * @Param isActive           Whether or not the method does anything
      * @Return didShootPosition  Returns true if successfully positioned, returns false if not
      */
-
-     private boolean shootPosEnabled;
-
     public boolean shootPosition(double timeout, boolean isActive) 
     {
-        if (isActive) {shootPosTime.start(); shootPosEnabled = true;}
+        if (isActive) {shootPosTime.start();}
         
-        if (shootPosEnabled)
+        if (shootPosTime.get() > 0)
         {
-            if (shootPosTime.get() <= timeout && shootPosTime.get() > 0) 
+            if (shootPosTime.get() <= timeout) 
             {
-                if (rightBaseEncoder.getPosition() < Constants.shootPosition - 1) 
+                if (GetArmAverage() < Constants.shootPosition - 1) 
                 {
                     rightBaseMotor.set(0.4);
                 } 
-                else if (rightBaseEncoder.getPosition() > Constants.shootPosition + 0.5)
+                else if (GetArmAverage() > Constants.shootPosition + 1)
                 {
                     rightBaseMotor.set(-0.4);
                 } 
-                else if (rightBaseEncoder.getPosition() >= Constants.shootPosition - 1 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 0.5)
+                else //if (GetArmAverage() >= Constants.shootPosition - 1 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 0.5)
                 {
-                    shootPosEnabled = false;
                     rightBaseMotor.set(0);
-                    didShootPosition = true;
-
+                    //Set canHold to true so arm is held in place.
+                    canHold = true;
+                    //Reset timers.
                     shootPosTime.stop();
                     shootPosTime.reset();
+                    return true;
                     // led.setBoard("green");
                 }
             } 
             else 
             {
-                shootPosEnabled = false;
                 rightBaseMotor.set(0);
-                didShootPosition = false;
 
                 shootPosTime.stop();
                 shootPosTime.reset();
                 // led.setBoard("red");
             }
         }
-        return didShootPosition;
+        return false;
     }
 
-
+    //Variables associated:
     private static Timer ampPosTime = new Timer();
-    private boolean didAmpPosition = false;
-
     //#AMPPOSITION
     //This method will bring the manipulator to a position for it to score in the amp
     /*
@@ -201,290 +201,375 @@ public class Manipulator extends SubsystemBase
      * @Param isActive          Whether or not the method does anything
      * @Return didAmpPosition   Returns true if positioned successfully, returns false if not
      */
-
-     private boolean ampPosEnabled = false;
-
     public boolean ampPosition(double timeout, boolean isActive) 
     {
-        if (isActive) {ampPosTime.start(); ampPosEnabled = true;}
+        if (isActive) {ampPosTime.start(); canHold = false;}
         
-        if (ampPosEnabled) 
+        if (ampPosTime.get() > 0) 
         {
-            if (ampPosTime.get() <= timeout && ampPosTime.get() > 0) 
+            if (ampPosTime.get() <= timeout) 
             {
-                if (!backSensor.get()) 
+                if (backSensor.get()) 
                 {
-                    rightBaseMotor.set(-0.5);
-                } 
-                else 
-                {
-                    ampPosEnabled = false;
                     rightBaseMotor.set(0);
-                    didAmpPosition = true;
-                    rightBaseEncoder.setPosition(-95 + 20);
+                    setArmEncoders(-95 + 20);
 
                     ampPosTime.stop();
                     ampPosTime.reset();
+
+                    return true;
                     // led.setBoard("green");
-                }
+                }            
+                rightBaseMotor.set(-0.5);
             } 
-            else 
+            else if (ampPosTime.get() > timeout)
             {
-                ampPosEnabled = false;
                 rightBaseMotor.set(0);
-                didAmpPosition = false;
 
                 ampPosTime.stop();
                 ampPosTime.reset();
                 // led.setBoard("red");
             }
         }
-        return didAmpPosition;
+        return false;
     }
 
 
-        //#MANIPULATORDASHBOARD
-        //This method updates the dashboard with all the data from the manipulator class
-        public void manipulatorDashboard() 
+
+    //#MOVEARM
+    // @Param armPower      The percent rotation speed of the motor
+    public void moveArm(double ArmPower)
+    {
+        //Reset canHold when the trigger(s) are pressed.
+        if (Math.abs(ArmPower) > 0) 
         {
-            //Tell if it is in manual or not
-            SmartDashboard.putBoolean("Is Manual?", !usingDigitalSensors);
-
-            //Push the digital sensor data to the shuffleboard
-            SmartDashboard.putBoolean("Beam Sensor", intakeSensor.get());
-            SmartDashboard.putBoolean("Front Sensor", frontSensor.get());
-            SmartDashboard.putBoolean("Back Sensor", backSensor.get());
-
-            //Push the encoder values to shuffleboard
-            SmartDashboard.putNumber("Manipulator Base Encoder", rightBaseEncoder.getPosition());
-        }
-
-        //#ARMPOWER
-        // @Param armPower      The percent rotation speed of the motor
-        public void moveArm(double ArmPower)
-        {
-            if (!frontSensor.get() && -ArmPower < 0) rightBaseMotor.set(0);
-            if (backSensor.get() && -ArmPower > 0) rightBaseMotor.set(0);
+            canHold = false;
+            //Set arm power.
             rightBaseMotor.set(-ArmPower);
+            if (!frontSensor.get() && -ArmPower > 0) rightBaseMotor.set(0);
+            else if (backSensor.get() && -ArmPower < 0) rightBaseMotor.set(0);
+        }   else if (Math.abs(ArmPower) == 0 && !canHold) rightBaseMotor.set(0);
+    }
+
+
+    //Variables associated:
+    private Timer scoreTime = new Timer();
+    //#SHOOTNOTE
+    /*
+    *@Param isActive      Whether or not the method does anything
+    */
+    public void shootNote(boolean isActive)
+    {
+        if (isActive)
+        {
+            scoreTime.start();
+            ampMotor.set(0.65);
         }
+        // if (scoreTime.get() > .75)
+        // {
+        //     intakeMotor.set(0);
+        //     ampMotor.set(0);
 
+        //     scoreTime.stop();
+        //     scoreTime.reset();
+        // }
+        // else if (scoreTime.get() >= .3) intakeMotor.set(-0.4);
+        // else intakeMotor.set(0);
 
+        if (scoreTime.get() < 0.3 && scoreTime.get() > 0) intakeMotor.set(0);
+        if (scoreTime.get() >= 0.3 && scoreTime.get() < 0.75) intakeMotor.set(-0.4);
+        if (scoreTime.get() > 0.75)
+        {
+            intakeMotor.set(0);
+            ampMotor.set(0);
 
-        private Timer scoreTime = new Timer();
+            scoreTime.stop();
+            scoreTime.reset();
+        }
+    }
 
-        //#SHOOTNOTE
-        /*
-        *@Param isActive      Whether or not the method does anything
+    //#REVUPFLYWHEEL
+    //An alternative method that only ramps up the flywheel, nothing else.
+    //Used mostly for autonomous.
+    public void revUpFlywheel(boolean enable){
+        if (enable) ampMotor.set(.55);
+        else ampMotor.set(0);
+    }
+
+    //Variables associated
+    private Timer aScoreTime = new Timer();
+    //#AMPSCORE
+    /*
+        * @Param isActive      Whether or not the method does anything
         */
-        public void shootNote(boolean isActive)
+    public void ampScore(boolean isActive)
+    {
+        if (isActive)
         {
-            if (isActive)
+            aScoreTime.start();
+            ampMotor.set(0.3);
+        }
+        // if (aScoreTime.get() > .75)
+        // {
+        //     intakeMotor.set(0);
+        //     ampMotor.set(0);
+
+        //     aScoreTime.stop();
+        //     aScoreTime.reset();
+        // }
+        // else if (aScoreTime.get() >= .3) intakeMotor.set(-0.4);
+        // else intakeMotor.set(0);
+        if (aScoreTime.get() < 0.3 && aScoreTime.get() > 0) intakeMotor.set(0);
+        if (aScoreTime.get() >= 0.3 && aScoreTime.get() < 0.75) intakeMotor.set(-0.4);
+        if (aScoreTime.get() > 0.75)
+        {
+            intakeMotor.set(0);
+            ampMotor.set(0);
+
+            aScoreTime.stop();
+            aScoreTime.reset();
+        }
+    }
+
+
+    private Timer drivePosTime = new Timer();
+    private boolean didDrivePosition = false;
+
+    //#DRIVEPOSITION
+    public boolean drivePosition(double timeout, boolean isActive)
+    {
+            if (isActive) drivePosTime.start();
+    
+        if (drivePosTime.get() <= timeout && drivePosTime.get() > 0) 
+        {
+            if (rightBaseEncoder.getPosition() < Constants.drivePosition - 1) 
             {
-                scoreTime.start();
-                ampMotor.set(0.5);
+                rightBaseMotor.set(0.4);
             } 
-                if (scoreTime.get() < 0.3 && scoreTime.get() > 0) intakeMotor.set(0);
-                if (scoreTime.get() >= 0.3 && scoreTime.get() < 0.75) intakeMotor.set(-0.4);
-                if (scoreTime.get() > 0.75)
-                {
-                    intakeMotor.set(0);
-                    ampMotor.set(0);
-
-                    scoreTime.stop();
-                    scoreTime.reset();
-                }
-        }
-
-
-        private Timer aScoreTime = new Timer();
-
-        //#AMPSCORE
-        /*
-         * @Param isActive      Whether or not the method does anything
-         */
-        public void ampScore(boolean isActive)
-        {
-            if (isActive)
+            else if (rightBaseEncoder.getPosition() > Constants.drivePosition + 0.5)
             {
-                aScoreTime.start();
-                ampMotor.set(0.3);
+                rightBaseMotor.set(-0.4);
             } 
-                if (aScoreTime.get() < 0.3 && aScoreTime.get() > 0) intakeMotor.set(0);
-                if (aScoreTime.get() >= 0.3 && aScoreTime.get() < 0.75) intakeMotor.set(-0.4);
-                if (aScoreTime.get() > 0.75)
-                {
-                    intakeMotor.set(0);
-                    ampMotor.set(0);
-
-                    aScoreTime.stop();
-                    aScoreTime.reset();
-                }
-        }
-
-
-        //#RUNINTAKE
-        /*
-         * @Param isReverse     Whether or not the intake motors are reversed
-         * @Param isActive      Whether or not the method does anything
-         */
-        public void runIntake(boolean isReverse, boolean isActive)
-        {
-            if (!isReverse && isActive) intakeMotor.set(-.4);
-            else if (isReverse && !isActive) intakeMotor.set(.2);
-            else intakeMotor.set(0);
-        }
-
-
-        public static boolean didIntake = false;
-        private static Timer intakeTime = new Timer();
-
-        //#INTAKE
-        //This method will intake a note
-        /*
-         * @Param timeout       The time limit of the method
-         * @Param doesIntake    Whether or not the method does anything
-         */
-        private boolean enabled;
-        public void intake(double timeout, boolean doesIntake) 
-        {
-            if (doesIntake) {intakeTime.start(); enabled = true;}
-
-            if (enabled)
+            else if (rightBaseEncoder.getPosition() >= Constants.drivePosition - 1 && rightBaseEncoder.getPosition() <= Constants.drivePosition + 0.5)
             {
-                if (intakeTime.get() <= timeout && intakeTime.get() > 0) 
-                {
-                    if (!intakeSensor.get()) 
-                    {
-                        intakeMotor.set(-0.4);
-                    } 
-                    else
-                    {
-                        intakeMotor.set(0);
-                        didIntake = true;
-                        enabled = false;
+                rightBaseMotor.set(0);
+                didDrivePosition = true;
 
-                        intakeTime.stop();
-                        intakeTime.reset();
-                    }
+                drivePosTime.stop();
+                drivePosTime.reset();
+                // led.setBoard("green");
+            }
+        } 
+        else 
+        {
+            rightBaseMotor.set(0);
+            didDrivePosition = false;
+
+            drivePosTime.stop();
+            drivePosTime.reset();
+            // led.setBoard("red");
+        }
+    return didDrivePosition;
+    }
+
+    //#RUNINTAKE
+    /*
+        * @Param isReverse     Whether or not the intake motors are reversed
+        * @Param isActive      Whether or not the method does anything
+        */
+    public void runIntake(boolean isReverse, boolean isActive)
+    {
+        if (!isReverse && isActive) intakeMotor.set(-.4);
+        else if (isReverse && !isActive) intakeMotor.set(.2);
+        else intakeMotor.set(0);
+    }
+
+
+    //#PECKINTAKE
+    /*
+    * @Param 
+    */
+    public boolean peckIntake(boolean isActive)
+    {
+        if (isActive)
+        {
+            if (intakePosition(5, true))
+            {
+                rightBaseEncoder.setPosition(0);
+                if (intake(5, true))
+                {
+
+                }
+            }
+        }   
+        return false;
+    }
+
+    //Variables associated:
+    private static Timer intakeTime = new Timer();
+    //#INTAKE
+    //This method will intake a note
+    /*
+        * @Param timeout       The time limit of the method
+        * @Param doesIntake    Whether or not the method does anything
+        */
+    public boolean intake(double timeout, boolean doesIntake) 
+    {
+        if (doesIntake) {intakeTime.start();}
+
+        if (intakeTime.get() > 0)
+        {
+            if (intakeTime.get() <= timeout) 
+            {
+                if (!intakeSensor.get()) 
+                {
+                    intakeMotor.set(-0.4);
                 } 
-                else 
+                else
                 {
                     intakeMotor.set(0);
-                    didIntake = false;
-                    enabled = false;
-
+                    
                     intakeTime.stop();
                     intakeTime.reset();
-                }
-            }
-           
-        }
 
-
-
-        
-
-
-        //#AUTOSHOOT
-        //@Param shootTime      The duration for which the motors will run
-        private Timer shootTimer = new Timer();
-        public void autoShoot(double shootTime)
-        {
-            shootTimer.start();
-
-            ampMotor.set(0.6);
-            if (shootTimer.get() < shootTime + 1.5 && shootTimer.get() > 1.5) 
-            {
-                intakeMotor.set(0.3);
-            }
-            else if (shootTimer.get() > shootTime + 1.5)
-            {
-                intakeMotor.set(0);
-                ampMotor.set(0);
-                shootTimer.stop();
-                shootTimer.reset();
-            }
-        }
-
-
-
-        //#MOVEMANIPULATOR
-        //This method will move the manipulator forward by a set time
-        /*
-         * @Param moveTime              The time for which the manipulator will move
-         * @Param isNegative            Determines whether the robot will move in a positive or negative direction
-         * @Return didMoveManipulator   Returns true when finished moving
-         */
-        private boolean didMoveManipulator = false;
-        public boolean moveManipulator(double moveTime, boolean isNegative) 
-        {
-            Timer moveTimer = new Timer();
-            moveTimer.reset();
-            moveTimer.start();
-
-            if (!isNegative) 
-            {
-                if (moveTimer.get() <= moveTime) 
-                {
-                rightBaseMotor.set(-0.2);
-                } 
-                else 
-                {
-                rightBaseMotor.set(0);
-                didMoveManipulator = true;
+                    return true;
                 }
             } 
-            else   
+            else 
             {
-                Timer moveTimer2 = new Timer();
-                moveTimer2.reset();
-                moveTimer2.start();
+                intakeMotor.set(0);
 
-                if (moveTimer2.get() <= moveTime) 
-                {
-                rightBaseMotor.set(0.2);
-                } else 
-                {
-                rightBaseMotor.set(0);
-                didMoveManipulator = true;
-                }
+                intakeTime.stop();
+                intakeTime.reset();
             }
-            return didMoveManipulator;
         }
+        return false;
+    }
 
+    //Periodic Functions
 
-        
-        boolean setPos = false;
-        double holdPos = 0;
-
+    //Variables associated
+    private boolean canHold = false;
     //#HOLDMANIPULATOR
-    /*
-     *@Param isHolding      Whether or not the method does anything
-     */
-    public void holdManipulator(boolean isHolding) 
+    //If the boolean "canHold" is set, runs this segment to keep the arm stable.
+    public void holdManipulator(){
+        if (canHold) rightBaseMotor.set(-0.03);
+    }
+
+    //#MANIPULATORDASHBOARD
+    //This method updates the dashboard with all the data from the manipulator class
+    public void manipulatorDashboard() 
     {
-        if (isHolding) rightBaseMotor.set(-0.03);
+        //Push the digital sensor data to the shuffleboard
+        SmartDashboard.putBoolean("Beam Sensor", intakeSensor.get());
+        SmartDashboard.putBoolean("Front Sensor", frontSensor.get());
+        SmartDashboard.putBoolean("Back Sensor", backSensor.get());
+        SmartDashboard.putBoolean("Is Holding", canHold);
+
+        //Push the encoder values to shuffleboard
+        SmartDashboard.putNumber("Manipulator Arm Encoder Average", GetArmAverage());
+    }
+
+    //#PERIODIC
+    //Runs functions within this file periodically (about every ~20ms).
+    @Override
+    public void periodic()
+    {
+        holdManipulator();
+        manipulatorDashboard();
+
+        if (!frontSensor.get()) resetEncoders();
+        if (backSensor.get()) setArmEncoders(-95 + 20);
+    }
+
+    
+
+
+    //#AUTOSHOOT
+    //@Param shootTime      The duration for which the motors will run
+    private Timer shootTimer = new Timer();
+    public void autoShoot(double shootTime)
+    {
+        shootTimer.start();
+
+        ampMotor.set(0.6);
+        if (shootTimer.get() < shootTime + 1.5 && shootTimer.get() > 1.5) 
+        {
+            intakeMotor.set(0.3);
+        }
+        else if (shootTimer.get() > shootTime + 1.5)
+        {
+            intakeMotor.set(0);
+            ampMotor.set(0);
+            shootTimer.stop();
+            shootTimer.reset();
+        }
     }
 
 
-        //#AUTOMANIPULATOR
-        //This method will do all of the actions for our manipulator during auto
-        /*
-         * @Param doesIntake        If true, then the manipulator will go to the intake position and intake a note
-         * @Param doesAim           If true, then the manipulator will go to the shooting position
-         * @Param doesShoot         If true, then the manipulator will shoot a note
-         * @Param doesAmpAim        If true, then the manipulator will go to the amp position
-         * @Param doesAmp           If true, then the manipulator will score in the amp
-         */
-        public void autoManipulator(boolean doesIntake, boolean doesAim, boolean doesShoot, boolean doesAmpAim, boolean doesAmp) 
+
+    //#MOVEMANIPULATOR
+    //This method will move the manipulator forward by a set time
+    /*
+        * @Param moveTime              The time for which the manipulator will move
+        * @Param isNegative            Determines whether the robot will move in a positive or negative direction
+        * @Return didMoveManipulator   Returns true when finished moving
+        */
+    private boolean didMoveManipulator = false;
+    public boolean moveManipulator(double moveTime, boolean isNegative) 
+    {
+        Timer moveTimer = new Timer();
+        moveTimer.reset();
+        moveTimer.start();
+
+        if (!isNegative) 
         {
-            if (doesIntake) 
+            if (moveTimer.get() <= moveTime) 
             {
-                if (intakePosition(5, true)) intake(3, true);
+            rightBaseMotor.set(-0.2);
+            } 
+            else 
+            {
+            rightBaseMotor.set(0);
+            didMoveManipulator = true;
             }
-            if (doesAim) shootPosition(5, true);
-            if (doesShoot) shootNote(true);
-            if (doesAmpAim) ampPosition(5, true);
-            if (doesAmp) ampScore(true);
+        } 
+        else   
+        {
+            Timer moveTimer2 = new Timer();
+            moveTimer2.reset();
+            moveTimer2.start();
+
+            if (moveTimer2.get() <= moveTime) 
+            {
+            rightBaseMotor.set(0.2);
+            } else 
+            {
+            rightBaseMotor.set(0);
+            didMoveManipulator = true;
+            }
         }
+        return didMoveManipulator;
+    }
+
+    //#AUTOMANIPULATOR
+    //This method will do all of the actions for our manipulator during auto
+    /*
+        * @Param doesIntake        If true, then the manipulator will go to the intake position and intake a note
+        * @Param doesAim           If true, then the manipulator will go to the shooting position
+        * @Param doesShoot         If true, then the manipulator will shoot a note
+        * @Param doesAmpAim        If true, then the manipulator will go to the amp position
+        * @Param doesAmp           If true, then the manipulator will score in the amp
+        */
+    public void autoManipulator(boolean doesIntake, boolean doesAim, boolean doesShoot, boolean doesAmpAim, boolean doesAmp) 
+    {
+        if (doesIntake) 
+        {
+            if (intakePosition(5, true)) intake(3, true);
+        }
+        if (doesAim) shootPosition(5, true);
+        if (doesShoot) shootNote(true);
+        if (doesAmpAim) ampPosition(5, true);
+        if (doesAmp) ampScore(true);
+    }
 }

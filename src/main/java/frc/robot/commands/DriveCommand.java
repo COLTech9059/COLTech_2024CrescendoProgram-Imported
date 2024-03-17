@@ -26,7 +26,7 @@ public class DriveCommand extends Command
     @Override
     public void execute()
     {
-        drivetrain.drive(forward.getAsDouble(), turn.getAsDouble());
+        drivetrain.drive(-forward.getAsDouble(), turn.getAsDouble());
     }
 
 }

@@ -18,28 +18,30 @@ public class ArmCommand extends Command{
     private final BooleanSupplier ampActive;
 
     //Operator controller
-    private final BooleanSupplier holdManipulator;
     private final BooleanSupplier intakePosition;
     private final BooleanSupplier ampPosition;
     private final BooleanSupplier shootPosition;
 
-    public ArmCommand(Manipulator sentManip, DoubleSupplier armPower, BooleanSupplier shootActive, BooleanSupplier intakeActive, BooleanSupplier canReverseIntake, BooleanSupplier ampActive, BooleanSupplier holdManipulator, BooleanSupplier intakePosition, BooleanSupplier ampPosition, BooleanSupplier shootPosition)
+    public ArmCommand(Manipulator sentManip, DoubleSupplier armPower, BooleanSupplier shootActive, BooleanSupplier intakeActive, BooleanSupplier canReverseIntake, BooleanSupplier ampActive, BooleanSupplier intakePosition, BooleanSupplier ampPosition, BooleanSupplier shootPosition)
     {
         //Initialize DoubleSuppliers and the Manipulator.
         m_Manipulator = sentManip;
-        //For Evan: we can use a singular armPower variable to make things simpler
-        //and also be able to control arm speed with the other trigger.
+        //Initialize Suppliers/Button Inputs.
         ArmPower = armPower;
         shootEnabled = shootActive;
         this.intakeActive = intakeActive;
         this.canReverseIntake = canReverseIntake;
         this.ampActive = ampActive;
-        this.holdManipulator = holdManipulator;
         this.intakePosition = intakePosition;
         this.ampPosition = ampPosition;
         this.shootPosition = shootPosition;
 
         addRequirements(m_Manipulator);
+    }
+
+    @Override
+    public void initialize(){
+        m_Manipulator.resetEncoders();
     }
 
     @Override
@@ -50,8 +52,8 @@ public class ArmCommand extends Command{
         m_Manipulator.shootNote(shootEnabled.getAsBoolean());
         m_Manipulator.ampScore(ampActive.getAsBoolean());
         m_Manipulator.intake(2, intakeActive.getAsBoolean());
-        // m_Manipulator.runIntake(true, canReverseIntake.getAsBoolean());
-        m_Manipulator.holdManipulator(holdManipulator.getAsBoolean());
+        //Backup incase the optic sensor is damaged.
+        // m_Manipulator.runIntake(canReverseIntake.getAsBoolean(), intakeActive.getAsBoolean());
         m_Manipulator.intakePosition(3, intakePosition.getAsBoolean());
         m_Manipulator.ampPosition(3, ampPosition.getAsBoolean());
         m_Manipulator.shootPosition(3, shootPosition.getAsBoolean());

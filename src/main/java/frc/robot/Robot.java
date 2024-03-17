@@ -4,13 +4,15 @@
 
 package frc.robot;
 
+import java.util.function.Supplier;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cameraserver.CameraServerShared;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.LimeLight;
-import frc.robot.subsystems.Manipulator;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,13 +21,12 @@ import frc.robot.subsystems.Manipulator;
  * project.
  */
 public class Robot extends TimedRobot {
+
   private Command m_autonomousCommand;
-
-  private DriveTrain drivetrain;
-  private Manipulator manipulator;
-  private LimeLight limelight;
-
   private RobotContainer m_RobotContainer;
+
+
+  public static int autoID = 0;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -34,13 +35,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    // m_RobotContainer.m_DriveTrain.resetDrive();
-    // m_RobotContainer.m_Manipulator.initializeManipulator();
-    limelight = new LimeLight();
-    manipulator = new Manipulator();
-    drivetrain = new DriveTrain();
+    m_RobotContainer = new RobotContainer();
 
-    m_RobotContainer = new RobotContainer(drivetrain, limelight, manipulator);
+
+    CameraServer.startAutomaticCapture();
   }
 
   /**
@@ -52,64 +50,21 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    drivetrain.encoderMath();
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-    limelight.postValues();
-    manipulator.manipulatorDashboard();
+    if (IO.oController.getStartButtonReleased()) autoID = 1;
+    if (autoID > 4 || autoID < 0) autoID = 0;
+
+    SmartDashboard.putNumber("Auto ID", autoID);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() 
-  {
-    manipulator.resetEncoders();
-
-    dropTime.stop();
-    dropTime.reset();
-  }
-
-  // private boolean segmentFinished = false;
-  // 
-  // //#AUTOSEGMENT
-  // //This method will perform a segment of an auto program
-  // public boolean autoSegment(int ID)
-  // {
-  //   if (ID == 1)
-  //   {
-  //     manipulator.intakePosition(5, true);
-  //     manipulator.spinUp();
-
-  //     if (dropTime.get() >= 1.7)
-  //     {
-  //       manipulator.runIntakeMotor();
-  //     }
-  //     if (dropTime.get() >= 2.5)
-  //     {
-  //       manipulator.stopIntakeMotor();
-  //       manipulator.stopSpinUp();
-  //       segmentFinished = true;
-  //     }
-  //   }
-  //   if (ID == 2)
-  //   {
-  //     drivetrain.autoDrive(0.5, 40, 0, 0);
-  //     manipulator.autoManipulator(true, false, false, false, false);
-  //     drivetrain.autoDrive(-0.5, 40, 0, 0);
-  //     manipulator.autoManipulator(false, true, true, false, false);
-  //     segmentFinished = true;
-  //   }
-  //   if (ID == 3)
-  //   {
-
-  //   }
-  //   return segmentFinished;
-  // }
-
+  public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {}
@@ -117,26 +72,17 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    
-
     // schedule the autonomous command (example)
+    m_autonomousCommand = m_RobotContainer.getAutoCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    limelight.start();
-
-    dropTime.start();
-
-    // segmentFinished = false;
   }
 
-  private Timer dropTime = new Timer();
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
 
-
-  Timer driveTime = new Timer();
   @Override
   public void teleopInit() {
     // This makes sure that the autonomous stops running when
@@ -146,23 +92,11 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
-    // dCommand.schedule();
-
-
-    driveTime.stop();
-    driveTime.reset();
-    driveTime.start();
   }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-    // drivetrain.drive();
-    // manipulator.controlManipulator();
-
-
-  }
+  public void teleopPeriodic() {}
 
   @Override
   public void testInit() {
