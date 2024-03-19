@@ -1,6 +1,10 @@
 package frc.robot;
 
 import frc.robot.subsystems.*;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.*;
 
@@ -13,11 +17,10 @@ public class RobotContainer {
     // private final XboxController xbContMovement = new XboxController(0);
     // private final XboxController xbContArm = new XboxController(1);
     //Autonomous Command.
-    private final Command m_autonomousCommand = new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, Robot.autoID);
+    // private final Command m_autonomousCommand = new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, Robot.autoID);
 
     public RobotContainer()
     {
-
         m_DriveTrain.setDefaultCommand
         (
             new DriveCommand
@@ -44,18 +47,18 @@ public class RobotContainer {
              )
         );
         //Future possible commands here.
-
-        configureButtons();
     }
 
-    private void configureButtons()
-    {
-        
-    }
+    ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
+
+        GenericEntry aChooser =
+          autoTab.add("Autonomous Chooser", 0)
+          .getEntry();
 
     //For getting the autonomous command.
-    public Command getAutoCommand()
+    public Command getAutoCommand(int autoID)
     {
-        return m_autonomousCommand;
+        Autonomous newAuto = new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, aChooser.getInteger(0));
+        return newAuto;
     }
 }

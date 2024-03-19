@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class Autonomous extends SequentialCommandGroup {
     
-    public Autonomous(DriveTrain dT, LimeLight LL, Manipulator M, int id)
+    public Autonomous(DriveTrain dT, LimeLight LL, Manipulator M, long id)
     {
         if (id == 0) {/*This is meant to do nothing*/};
 

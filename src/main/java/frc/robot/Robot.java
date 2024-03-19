@@ -4,17 +4,7 @@
 
 package frc.robot;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cameraserver.CameraServerShared;
-import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -29,11 +19,6 @@ public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
   private RobotContainer m_RobotContainer;
-
-  private ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
-
-  private SimpleWidget aChooser =
-          autoTab.add("Autonomous ID", 0);
 
   public static int autoID = 0;
   /**
@@ -62,11 +47,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-
-    if (IO.oController.getStartButtonReleased()) autoID = 1;
-    if (autoID > 4 || autoID < 0) autoID = 0;
-
-    SmartDashboard.putNumber("Auto ID", autoID);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -80,7 +60,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // schedule the autonomous command (example)
-    m_autonomousCommand = m_RobotContainer.getAutoCommand();
+    m_autonomousCommand = m_RobotContainer.getAutoCommand(autoID);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
