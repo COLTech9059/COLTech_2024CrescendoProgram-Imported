@@ -67,9 +67,63 @@ public class RobotContainer {
     private Sendable sendDT = m_DriveTrain;
     private Sendable sendManip = m_Manipulator;
 
+    private GenericEntry moveSpeed =
+            Shuffleboard.getTab("SmartDashboard")
+            .add("Move Speed", 0.5)
+            .getEntry();
+            
+    private GenericEntry moveDist =
+            Shuffleboard.getTab("SmartDashboard")
+            .add("Move Distance", 36)
+            .getEntry();
+
+    private boolean eArm = false;
+    private GenericEntry enableArm =
+            Shuffleboard.getTab("SmartDashboard")
+            .add("Move Arm", 0)
+            .getEntry();
+
+    private boolean aDirection = false;
+    private GenericEntry armDirection =
+            Shuffleboard.getTab("SmartDashboard")
+            .add("Arm Direction", 0)
+            .getEntry();
+
+    private GenericEntry start =
+            Shuffleboard.getTab("SmartDashboard")
+            .add("Start Time", 2.2)
+            .getEntry();
+
+    private GenericEntry end =
+            Shuffleboard.getTab("SmartDashboard")
+            .add("End Time", 3)
+            .getEntry();
+
+    private GenericEntry tPower =
+            Shuffleboard.getTab("ShuffleBoard")
+            .add("Turn Power", 0)
+            .getEntry();
+
+    private GenericEntry tTime =
+            Shuffleboard.getTab("ShuffleBoard")
+            .add("Turn Time", 0)
+            .getEntry();
+
     public void subsystemDashboard()
     {
         SmartDashboard.putData("DriveTrain", sendDT);
         SmartDashboard.putData("Manipulator", sendManip);
+
+        if (enableArm.getDouble(0) == 0) eArm = false;
+        else eArm = true;
+
+        if (armDirection.getDouble(0) == 0) aDirection = false;
+        else aDirection = true;
+
+        SmartDashboard.putData("Autonomous Command", new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, aChooser.getInteger(4)));
+        SmartDashboard.putData("Drive Forward Command", new MoveForwardInches(m_DriveTrain, m_Manipulator, moveSpeed.getDouble(0.5), moveDist.getDouble(36), false));
+        SmartDashboard.putData("Reset Position Command", new ResetPosition(m_Manipulator));
+        SmartDashboard.putData("Speaker Score Command", new SpeakerScore(m_Manipulator, eArm, aDirection, start.getDouble(2.2), end.getDouble(3)));
+        SmartDashboard.putData("Timed Turn Command", new TurnWithTimer(m_DriveTrain, tPower.getDouble(0), tTime.getDouble(0)));
     }
 }
