@@ -1,13 +1,24 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.BooleanEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 
 public class Manipulator extends SubsystemBase
 {
@@ -456,18 +467,62 @@ public class Manipulator extends SubsystemBase
         if (canHold) rightBaseMotor.set(-0.03);
     }
 
+    private BooleanSupplier opticalSupplier;
+    private BooleanSupplier frontSupplier;
+    private BooleanSupplier backSupplier;
+    private BooleanSupplier cHSupplier;
+    private DoubleSupplier avgSupplier;
+
+    private ShuffleboardTab manipulatorTab = Shuffleboard.getTab("Manipulator");
+
+    private SuppliedValueWidget<Boolean> optical =
+            manipulatorTab.addBoolean("Optical Sensor", opticalSupplier)
+            .withSize(1, 1)
+            .withPosition(0, 0);
+
+    private SuppliedValueWidget<Boolean> front =
+            manipulatorTab.addBoolean("Front Sensor", frontSupplier)
+            .withSize(1, 1)
+            .withPosition(1, 0);
+
+    private SuppliedValueWidget<Boolean> back =
+            manipulatorTab.addBoolean("Back Sensor", backSupplier)
+            .withSize(1, 1)
+            .withPosition(2, 0);
+
+    private SuppliedValueWidget<Boolean> cHold =
+            manipulatorTab.addBoolean("Can Hold", cHSupplier)
+            .withSize(1, 1)
+            .withPosition(3, 0);
+
+    private SimpleWidget manipArmAvg =
+            manipulatorTab.addPersistent("Manipulator Arm Encoder Average", avgSupplier.getAsDouble())
+            .withSize(1, 1)
+            .withPosition(5, 0);
+
+    private ComplexWidget intakeCam =
+            manipulatorTab.add(CameraServer.startAutomaticCapture())
+            .withSize(3, 3)
+            .withPosition(0, 2);
+    
     //#MANIPULATORDASHBOARD
     //This method updates the dashboard with all the data from the manipulator class
     public void manipulatorDashboard() 
     {
-        //Push the digital sensor data to the shuffleboard
-        SmartDashboard.putBoolean("Beam Sensor", intakeSensor.get());
-        SmartDashboard.putBoolean("Front Sensor", frontSensor.get());
-        SmartDashboard.putBoolean("Back Sensor", backSensor.get());
-        SmartDashboard.putBoolean("Is Holding", canHold);
+        opticalSupplier = () -> intakeSensor.get();
+        frontSupplier = () -> frontSensor.get();
+        backSupplier = () -> backSensor.get();
+        cHSupplier = () -> canHold;
+        avgSupplier = () -> GetArmAverage();
 
-        //Push the encoder values to shuffleboard
-        SmartDashboard.putNumber("Manipulator Arm Encoder Average", GetArmAverage());
+        //Push the digital sensor data to the shuffleboard
+        // SmartDashboard.putBoolean("Beam Sensor", intakeSensor.get());
+        // SmartDashboard.putBoolean("Front Sensor", frontSensor.get());
+        // SmartDashboard.putBoolean("Back Sensor", backSensor.get());
+        // SmartDashboard.putBoolean("Is Holding", canHold);
+
+        // //Push the encoder values to shuffleboard
+        // SmartDashboard.putNumber("Manipulator Arm Encoder Average", GetArmAverage());
     }
 
     //#PERIODIC

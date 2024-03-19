@@ -4,12 +4,18 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -122,6 +128,13 @@ public class DriveTrain extends SubsystemBase
       static double rightDistance = 0;
       static double leftDistance = 0;
 
+      static DoubleSupplier avgEncoderDistance = () -> 0;
+
+      private ShuffleboardTab driveTab = Shuffleboard.getTab("Drive Tab");
+
+      private SimpleWidget encoderDistance =
+          driveTab.addPersistent("Average Encoder Distance", avgEncoderDistance);
+
       //#ENCODERMATH
       //This fucntion handles all of the math and data necessary to use the encoders
       public void encoderMath() 
@@ -133,8 +146,6 @@ public class DriveTrain extends SubsystemBase
         rightDistance = rightWheelRotations * 18;
         leftDistance = leftWheelRotations * 18;
 
-        // Displays the Left and Right encoder rates on the dashboard with the specified names
-        SmartDashboard.putNumber("Left Encoder Distance", leftDistance);
-        SmartDashboard.putNumber("Right Encoder Distance", rightDistance);
+        avgEncoderDistance = () -> (rightDistance + leftDistance) / 2;
       }
 }
