@@ -30,7 +30,7 @@ public class MoveForwardInches extends Command{
 
     @Override
     public void execute(){
-        travelledDistance = Math.abs(drivetrain.rightEncoder.getPosition() / 8.45 * 18);
+        travelledDistance = Math.abs(getEncoderAvg());
 
         //Drive forward until the distance has been travelled
         if (travelledDistance < distance) drivetrain.drive(-speed, 0);
@@ -44,5 +44,12 @@ public class MoveForwardInches extends Command{
     public void end(boolean interrupted){
         manipulator.runIntake(false, false);
         drivetrain.drive(0, 0);
+    }
+
+    //Helper Functions
+    public double getEncoderAvg(){
+        double rightDist = Math.abs(drivetrain.rightEncoder.getPosition() / 8.45 * 18);
+        double leftDist = Math.abs(drivetrain.leftEncoder.getPosition() / 8.45 * 18);
+        return (rightDist + leftDist) / 2;
     }
 }

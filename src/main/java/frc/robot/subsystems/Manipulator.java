@@ -190,9 +190,9 @@ public class Manipulator extends SubsystemBase
     //#AMPPOSITION
     //This method will bring the manipulator to a position for it to score in the amp
     /*
-     * @Param timeout           The time limit for the method
-     * @Param isActive          Whether or not the method does anything
-     * @Return didAmpPosition   Returns true if positioned successfully, returns false if not
+     * @param timeout           The time limit for the method
+     * @param isActive          Whether or not the method does anything
+     * @return didAmpPosition   Returns true if positioned successfully, returns false if not
      */
     public boolean ampPosition(double timeout, boolean isActive) 
     {
@@ -433,11 +433,11 @@ public class Manipulator extends SubsystemBase
         if (canHold) rightBaseMotor.set(-0.03);
     }
 
-    private BooleanSupplier opticalSupplier;
-    private BooleanSupplier frontSupplier;
-    private BooleanSupplier backSupplier;
-    private BooleanSupplier cHSupplier;
-    private DoubleSupplier avgSupplier;
+    private BooleanSupplier opticalSupplier = () -> intakeSensor.get();
+    private BooleanSupplier frontSupplier = () -> !frontSensor.get();
+    private BooleanSupplier backSupplier = () -> backSensor.get();
+    private BooleanSupplier cHSupplier = () -> canHold;
+    private DoubleSupplier avgSupplier = () -> GetArmAverage();
 
     private ShuffleboardTab manipulatorTab = Shuffleboard.getTab("Manipulator");
 
@@ -459,24 +459,24 @@ public class Manipulator extends SubsystemBase
     private SuppliedValueWidget<Boolean> cHold =
             manipulatorTab.addBoolean("Can Hold", cHSupplier)
             .withSize(1, 1)
-            .withPosition(3, 0);
+            .withPosition(0, 1);
 
     private SimpleWidget manipArmAvg =
             manipulatorTab.addPersistent("Manipulator Arm Encoder Average", avgSupplier.getAsDouble())
             .withSize(1, 1)
-            .withPosition(5, 0);
+            .withPosition(1, 1);
 
     private ComplexWidget intakeCam =
             manipulatorTab.add(CameraServer.startAutomaticCapture())
             .withSize(3, 3)
-            .withPosition(0, 2);
+            .withPosition(3, 0);
     
     //#MANIPULATORDASHBOARD
     //This method updates the dashboard with all the data from the manipulator class
     public void manipulatorDashboard() 
     {
         opticalSupplier = () -> intakeSensor.get();
-        frontSupplier = () -> frontSensor.get();
+        frontSupplier = () -> !frontSensor.get();
         backSupplier = () -> backSensor.get();
         cHSupplier = () -> canHold;
         avgSupplier = () -> GetArmAverage();

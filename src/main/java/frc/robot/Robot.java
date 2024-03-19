@@ -4,10 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.Autonomous;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.LimeLight;
+import frc.robot.subsystems.Manipulator;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,8 +24,6 @@ public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
   private RobotContainer m_RobotContainer;
-
-  public static int autoID = 0;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -47,6 +50,8 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+    m_RobotContainer.subsystemDashboard();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -60,7 +65,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     // schedule the autonomous command (example)
-    m_autonomousCommand = m_RobotContainer.getAutoCommand(autoID);
+    m_autonomousCommand = m_RobotContainer.getAutoCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }

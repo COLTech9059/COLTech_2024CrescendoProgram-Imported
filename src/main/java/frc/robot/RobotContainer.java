@@ -2,17 +2,19 @@ package frc.robot;
 
 import frc.robot.subsystems.*;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.*;
 
 public class RobotContainer {
     //Subsystem declarations.
-    private final DriveTrain m_DriveTrain = new DriveTrain();
-    private final LimeLight m_LimeLight = new LimeLight();
-    private final Manipulator m_Manipulator = new Manipulator();
+    public final DriveTrain m_DriveTrain = new DriveTrain();
+    public final LimeLight m_LimeLight = new LimeLight();
+    public final Manipulator m_Manipulator = new Manipulator();
     //Setup Controller.
     // private final XboxController xbContMovement = new XboxController(0);
     // private final XboxController xbContArm = new XboxController(1);
@@ -56,9 +58,18 @@ public class RobotContainer {
           .getEntry();
 
     //For getting the autonomous command.
-    public Command getAutoCommand(int autoID)
+    public Command getAutoCommand()
     {
         Autonomous newAuto = new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, aChooser.getInteger(0));
         return newAuto;
+    }
+
+    private Sendable sendDT = m_DriveTrain;
+    private Sendable sendManip = m_Manipulator;
+
+    public void subsystemDashboard()
+    {
+        SmartDashboard.putData("DriveTrain", sendDT);
+        SmartDashboard.putData("Manipulator", sendManip);
     }
 }

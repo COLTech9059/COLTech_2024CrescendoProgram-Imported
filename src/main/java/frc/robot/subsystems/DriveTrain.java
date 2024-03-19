@@ -9,6 +9,8 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -79,70 +81,32 @@ public class DriveTrain extends SubsystemBase
     encoderMath();
   }
 
-  //#AUTODRIVE
-  //This method drives the auto for _ amount of time in a + or - direction
-  /* @Param speed     The forward speed of the robot, can be negative
-   * @Param distance  The distance that the robot will drive
-   * @Param turn      The speed at which the robot will turn, must be used seperately from regular driving
-   * @Param turnTime  The length of time for which the robot will turn
-  */ 
-  public void autoDrive(double speed, double distance, double turn, double turnTime) 
+  public double rightWheelRotations = 0;
+  public double leftWheelRotations = 0;
+
+  public double rightDistance = 0;
+  public double leftDistance = 0;
+
+  public double avgEncoderDistance = 0;
+
+  private ShuffleboardTab driveTab = Shuffleboard.getTab("Drive Tab");
+
+  private GenericEntry encoderDistance =
+      driveTab.add("Average Encoder Distance", avgEncoderDistance)
+      .getEntry();
+
+  //#ENCODERMATH
+  //This function handles all of the math and data necessary to use the encoders
+  public void encoderMath() 
   {
-    distance = Math.abs(distance);
-    rightDistance = 0;
-    turnTimer.reset();
-    turnTimer.start();
-    rightEncoder.setPosition(0);
-    leftEncoder.setPosition(0);
-    rightDistance = Math.abs(rightEncoder.getPosition());
+    //All the math to convert encoder rotations to horizontal distance in inches
+    rightWheelRotations = rightEncoder.getPosition() / 8.45;
+    leftWheelRotations = leftEncoder.getPosition() / 8.45;
 
-    //Drive with positive distance
-    if (distance > 0 && rightDistance < distance) 
-    {
-      HamsterDrive.arcadeDrive(speed, 0, false);
-    } 
-    else if (rightDistance >= distance) 
-    {
-      HamsterDrive.arcadeDrive(0, 0, false);
-    }
+    rightDistance = rightWheelRotations * 18;
+    leftDistance = leftWheelRotations * 18;
 
-    //Turn
-    if (turnTimer.get() < turnTime && turn != 0) 
-    {
-      HamsterDrive.arcadeDrive(0, turn, false);
-    } 
-    else if (turnTimer.get() >= turnTime && turn != 0) 
-    {
-      HamsterDrive.arcadeDrive(0, 0, false);
-    }
+    avgEncoderDistance = (rightDistance + leftDistance) / 2;
+    encoderDistance.setDouble(avgEncoderDistance);
   }
-
-
-
-      static double rightWheelRotations = 0;
-      static double leftWheelRotations = 0;
-
-      static double rightDistance = 0;
-      static double leftDistance = 0;
-
-      static DoubleSupplier avgEncoderDistance;
-
-      private ShuffleboardTab driveTab = Shuffleboard.getTab("Drive Tab");
-
-      private SimpleWidget encoderDistance =
-          driveTab.addPersistent("Average Encoder Distance", avgEncoderDistance);
-
-      //#ENCODERMATH
-      //This fucntion handles all of the math and data necessary to use the encoders
-      public void encoderMath() 
-      {
-        //All the math to convert encoder rotations to horizontal distance in inches
-        rightWheelRotations = rightEncoder.getPosition() / 8.45;
-        leftWheelRotations = leftEncoder.getPosition() / 8.45;
-
-        rightDistance = rightWheelRotations * 18;
-        leftDistance = leftWheelRotations * 18;
-
-        avgEncoderDistance = () -> (rightDistance + leftDistance) / 2;
-      }
 }
