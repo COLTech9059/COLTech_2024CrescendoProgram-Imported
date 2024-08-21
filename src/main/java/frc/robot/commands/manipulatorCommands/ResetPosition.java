@@ -1,4 +1,4 @@
-package frc.robot.manipulatorCommands;
+package frc.robot.commands.manipulatorCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Manipulator;

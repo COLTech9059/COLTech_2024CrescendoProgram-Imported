@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.*;
-import frc.robot.driveCommands.DriveCommand;
-import frc.robot.manipulatorCommands.ArmCommand;
+import frc.robot.commands.driveCommands.DriveCommand;
+import frc.robot.commands.manipulatorCommands.ArmCommand;
 
 public class RobotContainer {
     //Subsystem declarations.
