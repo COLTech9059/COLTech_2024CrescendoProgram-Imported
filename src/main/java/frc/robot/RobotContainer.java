@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.*;
+import frc.robot.driveCommands.DriveCommand;
+import frc.robot.manipulatorCommands.ArmCommand;
 
 public class RobotContainer {
     //Subsystem declarations.
@@ -23,6 +25,13 @@ public class RobotContainer {
 
     public RobotContainer()
     {
+
+        // SmartDashboard.putData("Autonomous Command", new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, aChooser.getInteger(4)));
+        // SmartDashboard.putData("Drive Forward Command", new MoveForwardInches(m_DriveTrain, m_Manipulator, moveSpeed.getDouble(0.5), moveDist.getDouble(36), false));
+        // SmartDashboard.putData("Reset Position Command", new ResetPosition(m_Manipulator));
+        // SmartDashboard.putData("Speaker Score Command", new SpeakerScore(m_Manipulator, eArm, aDirection, start.getDouble(2.2), end.getDouble(3)));
+        // SmartDashboard.putData("Timed Turn Command", new TurnWithTimer(m_DriveTrain, tPower.getDouble(0), tTime.getDouble(0)));
+
         m_DriveTrain.setDefaultCommand
         (
             new DriveCommand
@@ -40,12 +49,13 @@ public class RobotContainer {
                 m_Manipulator, 
                 () -> (IO.dController.getRightTriggerAxis() - IO.dController.getLeftTriggerAxis()), 
                 () -> IO.oController.getRightBumper(), 
-                () -> IO.dController.getLeftBumper(),
+                () -> (IO.dController.getLeftBumper()),
                 () -> IO.dController.getAButton(),
                 () -> IO.oController.getLeftBumper(),
                 () -> IO.oController.getAButton(),
                 () -> IO.oController.getYButton(),
-                () -> IO.oController.getXButton()
+                () -> IO.oController.getXButton(),
+                () -> IO.oController.getBButton()
              )
         );
         //Future possible commands here.
@@ -54,13 +64,15 @@ public class RobotContainer {
     ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
 
         GenericEntry aChooser =
-          autoTab.add("Autonomous Chooser", 0)
+          Shuffleboard.getTab("Manipulator")
+          .add("Autonomous Chooser", 0)
+          .withPosition(0, 2)
           .getEntry();
 
     //For getting the autonomous command.
     public Command getAutoCommand()
     {
-        Autonomous newAuto = new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, aChooser.getInteger(0));
+        Autonomous newAuto = new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, aChooser.getInteger(4));
         return newAuto;
     }
 
@@ -100,12 +112,12 @@ public class RobotContainer {
             .getEntry();
 
     private GenericEntry tPower =
-            Shuffleboard.getTab("ShuffleBoard")
+            Shuffleboard.getTab("SmartDashboard")
             .add("Turn Power", 0)
             .getEntry();
 
     private GenericEntry tTime =
-            Shuffleboard.getTab("ShuffleBoard")
+            Shuffleboard.getTab("SmartDashboard")
             .add("Turn Time", 0)
             .getEntry();
 
@@ -119,11 +131,5 @@ public class RobotContainer {
 
         if (armDirection.getDouble(0) == 0) aDirection = false;
         else aDirection = true;
-
-        SmartDashboard.putData("Autonomous Command", new Autonomous(m_DriveTrain, m_LimeLight, m_Manipulator, aChooser.getInteger(4)));
-        SmartDashboard.putData("Drive Forward Command", new MoveForwardInches(m_DriveTrain, m_Manipulator, moveSpeed.getDouble(0.5), moveDist.getDouble(36), false));
-        SmartDashboard.putData("Reset Position Command", new ResetPosition(m_Manipulator));
-        SmartDashboard.putData("Speaker Score Command", new SpeakerScore(m_Manipulator, eArm, aDirection, start.getDouble(2.2), end.getDouble(3)));
-        SmartDashboard.putData("Timed Turn Command", new TurnWithTimer(m_DriveTrain, tPower.getDouble(0), tTime.getDouble(0)));
     }
 }

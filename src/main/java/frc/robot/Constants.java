@@ -32,11 +32,13 @@ public final class Constants {
  public static int frontSensorID = 1;
  public static int backSensorID = 2;
 
- //Miscellaneus manipulator values
+ //Manipulator Encoder Values
+ //Note: I assume encoder values are in DEGREES already, from what i've seen.
  //original value: -10.5
- public static double shootPosition = -15.5;
- public static double ampPosition = -30;
- public static double drivePosition = -25;
+ public static double shootPosition = -8.5;
+ public static double ampPosition = -30.0;
+ public static double drivePosition = -25.0;
+ public static double startPosition = -90.0;
  
  //LED port (PWM)
  public static int ledPort = 0;

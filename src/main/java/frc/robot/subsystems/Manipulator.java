@@ -72,10 +72,12 @@ public class Manipulator extends SubsystemBase
         followerAmpEncoder.setPosition(0);
     }
 
+    private double armAvg = 0;
     //#GETARMAVERAGE
     //Returns the average between the two arm motors, hopefully giving a more accurate value.
     public double GetArmAverage()
     {
+        armAvg = (rightBaseEncoder.getPosition() + leftBaseEncoder.getPosition()) / 2;
         return (rightBaseEncoder.getPosition() + leftBaseEncoder.getPosition()) / 2;
     }
 
@@ -119,7 +121,7 @@ public class Manipulator extends SubsystemBase
                     return true;
                 }
                 //Continue moving the arm until the above statement is satisfied.
-               rightBaseMotor.set(0.5);
+               rightBaseMotor.set(0.9);
             } 
             else
             {
@@ -152,15 +154,9 @@ public class Manipulator extends SubsystemBase
         {
             if (shootPosTime.get() <= timeout) 
             {
-                if (GetArmAverage() < Constants.shootPosition - 1) 
-                {
-                    rightBaseMotor.set(0.4);
-                } 
-                else if (GetArmAverage() > Constants.shootPosition + 1)
-                {
-                    rightBaseMotor.set(-0.4);
-                } 
-                else //if (GetArmAverage() >= Constants.shootPosition - 1 && rightBaseEncoder.getPosition() <= Constants.shootPosition + 0.5)
+                if (GetArmAverage() < Constants.shootPosition - 1) {rightBaseMotor.set(0.25);} 
+                else if (GetArmAverage() > Constants.shootPosition + 1) {rightBaseMotor.set(-0.25);} 
+                else
                 {
                     rightBaseMotor.set(0);
                     //Set canHold to true so arm is held in place.
@@ -213,7 +209,7 @@ public class Manipulator extends SubsystemBase
                     return true;
                     // led.setBoard("green");
                 }            
-                rightBaseMotor.set(-0.5);
+                rightBaseMotor.set(-0.80);
             } 
             else if (ampPosTime.get() > timeout)
             {
@@ -241,26 +237,28 @@ public class Manipulator extends SubsystemBase
             rightBaseMotor.set(-ArmPower);
             if (!frontSensor.get() && -ArmPower > 0) rightBaseMotor.set(0);
             else if (backSensor.get() && -ArmPower < 0) rightBaseMotor.set(0);
-        }   else if (Math.abs(ArmPower) == 0 && !canHold) rightBaseMotor.set(0);
+        }   
+        else if (Math.abs(ArmPower) == 0 && !canHold) rightBaseMotor.set(0);
     }
 
 
     //Variables associated:
     private Timer scoreTime = new Timer();
+    private boolean didShoot = false;
 
     //#SHOOTNOTE
     /*
     *@Param isActive      Whether or not the method does anything
     */
-    public void shootNote(boolean isActive)
+    public boolean shootNote(boolean isActive)
     {
         if (isActive)
         {
             scoreTime.start();
             ampMotor.set(0.65);
         }
-        if (scoreTime.get() < 0.3 && scoreTime.get() > 0) intakeMotor.set(0);
-        if (scoreTime.get() >= 0.3 && scoreTime.get() < 0.75) intakeMotor.set(-0.4);
+        if (scoreTime.get() < 0.3 && scoreTime.get() > 0) {intakeMotor.set(0); didShoot = false;} 
+        if (scoreTime.get() >= 0.3 && scoreTime.get() < 0.75) {intakeMotor.set(-0.4); didShoot = false;}
         if (scoreTime.get() > 0.75)
         {
             intakeMotor.set(0);
@@ -268,17 +266,19 @@ public class Manipulator extends SubsystemBase
 
             scoreTime.stop();
             scoreTime.reset();
+
+            didShoot = true;
         }
+        return didShoot;
     }
 
     //#REVUPFLYWHEEL
     //An alternative method that only ramps up the flywheel, nothing else.
     //Used mostly for autonomous.
     public void revUpFlywheel(boolean enable){
-        if (enable) ampMotor.set(.55);
+        if (enable) ampMotor.set(.70);
         else ampMotor.set(0);
     }
-
 
     //Variables associated
     private Timer aScoreTime = new Timer();
@@ -306,6 +306,15 @@ public class Manipulator extends SubsystemBase
         }
     }
 
+    public void eStop(boolean isActive) 
+    {
+        if (isActive)
+        {
+            intakeMotor.set(0);
+            ampMotor.set(0);
+            rightBaseMotor.set(0);
+        }
+    }
 
     private Timer drivePosTime = new Timer();
     private boolean didDrivePosition = false;
@@ -397,10 +406,7 @@ public class Manipulator extends SubsystemBase
         {
             if (intakeTime.get() <= timeout) 
             {
-                if (!intakeSensor.get()) 
-                {
-                    intakeMotor.set(-0.4);
-                } 
+                if (!intakeSensor.get()) {intakeMotor.set(-0.4);} 
                 else
                 {
                     intakeMotor.set(0);
@@ -426,15 +432,17 @@ public class Manipulator extends SubsystemBase
 
     //Variables associated
     private boolean canHold = false;
+    private boolean frontStatus = false;
+    private boolean opticalStatus = false;
 
     //#HOLDMANIPULATOR
     //If the boolean "canHold" is set, runs this segment to keep the arm stable.
-    public void holdManipulator(){
-        if (canHold) rightBaseMotor.set(-0.03);
+    public void holdManipulator(boolean Override){
+        if (Override || canHold) {rightBaseMotor.set(-0.03); setArmEncoders(Constants.shootPosition);}
     }
 
-    private BooleanSupplier opticalSupplier = () -> intakeSensor.get();
-    private BooleanSupplier frontSupplier = () -> !frontSensor.get();
+    private BooleanSupplier opticalSupplier = () -> opticalStatus;
+    private BooleanSupplier frontSupplier = () -> frontStatus;
     private BooleanSupplier backSupplier = () -> backSensor.get();
     private BooleanSupplier cHSupplier = () -> canHold;
     private DoubleSupplier avgSupplier = () -> GetArmAverage();
@@ -461,25 +469,30 @@ public class Manipulator extends SubsystemBase
             .withSize(1, 1)
             .withPosition(0, 1);
 
-    private SimpleWidget manipArmAvg =
-            manipulatorTab.addPersistent("Manipulator Arm Encoder Average", avgSupplier.getAsDouble())
+    private SuppliedValueWidget<Double> manipArmAvg =
+            manipulatorTab.addDouble("Manipulator Arm Encoder Average", avgSupplier)
             .withSize(1, 1)
             .withPosition(1, 1);
-
+            
     private ComplexWidget intakeCam =
             manipulatorTab.add(CameraServer.startAutomaticCapture())
             .withSize(3, 3)
-            .withPosition(3, 0);
+            .withPosition(4, 0);
     
     //#MANIPULATORDASHBOARD
     //This method updates the dashboard with all the data from the manipulator class
     public void manipulatorDashboard() 
     {
-        opticalSupplier = () -> intakeSensor.get();
-        frontSupplier = () -> !frontSensor.get();
+        if (intakeSensor.get()) opticalStatus = false;
+        else opticalStatus = true;
+
+        if (frontSensor.get()) frontStatus = false;
+        else frontStatus = true;
+
+        // opticalSupplier = () -> opticalStatus;
+        // frontSupplier = () -> frontStatus;
         backSupplier = () -> backSensor.get();
-        cHSupplier = () -> canHold;
-        avgSupplier = () -> GetArmAverage();
+        // cHSupplier = () -> canHold;
 
         //Push the digital sensor data to the shuffleboard
         // SmartDashboard.putBoolean("Beam Sensor", intakeSensor.get());
@@ -496,7 +509,7 @@ public class Manipulator extends SubsystemBase
     @Override
     public void periodic()
     {
-        holdManipulator();
+        holdManipulator(false);
         manipulatorDashboard();
 
         if (!frontSensor.get()) resetEncoders();

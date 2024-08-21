@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.driveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
@@ -25,7 +25,7 @@ public class MoveForwardInches extends Command{
         drivetrain.leftEncoder.setPosition(0.0);
         drivetrain.rightEncoder.setPosition(0.0);
         travelledDistance = 0.0;
-        if (intake) manipulator.runIntake(false, true);
+        if (intake) {manipulator.runIntake(false, true); manipulator.intakePosition(5, true); }
     }
 
     @Override

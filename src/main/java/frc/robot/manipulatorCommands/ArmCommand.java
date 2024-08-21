@@ -1,6 +1,6 @@
-package frc.robot.commands;
+package frc.robot.manipulatorCommands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Manipulator;
 import java.util.function.DoubleSupplier;
@@ -21,8 +21,9 @@ public class ArmCommand extends Command{
     private final BooleanSupplier intakePosition;
     private final BooleanSupplier ampPosition;
     private final BooleanSupplier shootPosition;
+    private final BooleanSupplier eStop;
 
-    public ArmCommand(Manipulator sentManip, DoubleSupplier armPower, BooleanSupplier shootActive, BooleanSupplier intakeActive, BooleanSupplier canReverseIntake, BooleanSupplier ampActive, BooleanSupplier intakePosition, BooleanSupplier ampPosition, BooleanSupplier shootPosition)
+    public ArmCommand(Manipulator sentManip, DoubleSupplier armPower, BooleanSupplier shootActive, BooleanSupplier intakeActive, BooleanSupplier canReverseIntake, BooleanSupplier ampActive, BooleanSupplier intakePosition, BooleanSupplier ampPosition, BooleanSupplier shootPosition, BooleanSupplier eStop)
     {
         //Initialize DoubleSuppliers and the Manipulator.
         m_Manipulator = sentManip;
@@ -35,8 +36,14 @@ public class ArmCommand extends Command{
         this.intakePosition = intakePosition;
         this.ampPosition = ampPosition;
         this.shootPosition = shootPosition;
+        this.eStop = eStop;
 
         addRequirements(m_Manipulator);
+
+        Shuffleboard.getTab("Manipulator")
+        .add("Arm Power", armPower.getAsDouble())
+        .withSize(1, 1)
+        .withPosition(2, 1);
     }
 
     @Override
@@ -57,8 +64,7 @@ public class ArmCommand extends Command{
         m_Manipulator.intakePosition(3, intakePosition.getAsBoolean());
         m_Manipulator.ampPosition(3, ampPosition.getAsBoolean());
         m_Manipulator.shootPosition(3, shootPosition.getAsBoolean());
-
-        SmartDashboard.putNumber("ArmPower", ArmPower.getAsDouble());
+        m_Manipulator.eStop(eStop.getAsBoolean());
     }
 
 

@@ -1,9 +1,13 @@
 package frc.robot.commands;
 
+import frc.robot.driveCommands.MoveForwardInches;
+import frc.robot.driveCommands.TurnWithTimer;
+import frc.robot.manipulatorCommands.EncoderSpeakerScore;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class Autonomous extends SequentialCommandGroup {
+public class Autonomous extends SequentialCommandGroup 
+{
     
     public Autonomous(DriveTrain dT, LimeLight LL, Manipulator M, long id)
     {
@@ -13,8 +17,7 @@ public class Autonomous extends SequentialCommandGroup {
         {
             addCommands
             (
-                new ResetPosition(M),
-                new SpeakerScore(M, true, true, 2.2, 3),
+                new EncoderSpeakerScore(M),
                 new TurnWithTimer(dT, 0.35, 2),
                 new MoveForwardInches(dT, M, 0.35, 48.0, false)
             );
@@ -23,12 +26,10 @@ public class Autonomous extends SequentialCommandGroup {
         {
             addCommands
             (
-                new ResetPosition(M),
-                new SpeakerScore(M, true, true, 2.2, 3),
+                new EncoderSpeakerScore(M),
                 new MoveForwardInches(dT, M, 0.35, 18.5, true),
-                // new LimeLightCommand(LL, dT),
                 new MoveForwardInches(dT, M, -0.35, 17.0, false),
-                new SpeakerScore(M, true, false, 0.6, 1.2),
+                new EncoderSpeakerScore(M),
                 new MoveForwardInches(dT, M, 0.35, 35.0, false)
             );
         }
@@ -36,8 +37,7 @@ public class Autonomous extends SequentialCommandGroup {
         {
             addCommands
             (
-                new ResetPosition(M),
-                new SpeakerScore(M, true, true, 2.2, 3),
+                new EncoderSpeakerScore(M),
                 new TurnWithTimer(dT, -0.35, 1.35),
                 new MoveForwardInches(dT, M, 0.35, 48.0, false)
             );
@@ -46,8 +46,14 @@ public class Autonomous extends SequentialCommandGroup {
         {
             addCommands
             (
-                new ResetPosition(M),
-                new SpeakerScore(M, true, true, 2.2, 3)
+                new EncoderSpeakerScore(M)
+            );
+        }
+        if (id == 5)
+        {
+            addCommands
+            (
+            new MoveForwardInches(dT, M, 0.35, 70, true)
             );
         }
     }
