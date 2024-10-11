@@ -26,19 +26,30 @@ public final class Constants {
  public static int ampID = 8;
  public static int ampFollowID = 9;
  public static int intakeID = 10;
- 
+
+ //Manipulator Gyro ID
+ public static int gyroID = 11;
+
  //Digital inputs DIO ports
  public static int intakeSensorID = 3;
  public static int frontSensorID = 1;
  public static int backSensorID = 2;
 
  //Manipulator Encoder Values
- //Note: I assume encoder values are in DEGREES already, from what i've seen.
+ //Note: Encoder values are in rotations, NOT DEGREES
  //original value: -10.5
- public static double shootPosition = -8.5;
+ public static double shootPosition = -7.0;
+ public static double supplyPosition = -15;
  public static double ampPosition = -30.0;
  public static double drivePosition = -25.0;
  public static double startPosition = -90.0;
+
+ public static double shootAngle = 115;
+ public static double resetAngle = 0;
+
+//Manipulator Shooting Values
+public static double shootSpeed = 0.70;
+public static double supplySpeed = 0.75;
  
  //LED port (PWM)
  public static int ledPort = 0;

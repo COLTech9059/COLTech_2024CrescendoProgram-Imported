@@ -25,11 +25,12 @@ public class MoveForwardInches extends Command{
         drivetrain.leftEncoder.setPosition(0.0);
         drivetrain.rightEncoder.setPosition(0.0);
         travelledDistance = 0.0;
-        if (intake) {manipulator.runIntake(false, true); manipulator.intakePosition(5, true); }
+        // if (intake) {manipulator.runIntake(false, true); manipulator.intakePosition(5, true); }
     }
 
     @Override
     public void execute(){
+        manipulator.intakePosition(5, true);
         travelledDistance = Math.abs(getEncoderAvg());
 
         //Drive forward until the distance has been travelled

@@ -2,9 +2,10 @@ package frc.robot.commands.driveCommands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Conversions;
 import frc.robot.subsystems.DriveTrain;
 
-public class TurnWithTimer extends Command
+public class TurnWithAngle extends Command
 {
     private DriveTrain drivetrain;
 
@@ -15,11 +16,11 @@ public class TurnWithTimer extends Command
 
     private boolean finished;
 
-    public TurnWithTimer(DriveTrain dT, double turnPower, double turnTime)
+    public TurnWithAngle(DriveTrain dT, double turnPower, double desiredAngle)
     {
         drivetrain = dT;
         this.turnPower = turnPower;
-        this.turnTime = turnTime;
+        this.turnTime = Conversions.findTurnTime(Math.abs(desiredAngle), turnPower);
 
         addRequirements(drivetrain);
     }

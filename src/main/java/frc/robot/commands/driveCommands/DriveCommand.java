@@ -2,6 +2,7 @@ package frc.robot.commands.driveCommands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Manipulator;
 
 import java.util.function.DoubleSupplier;
 

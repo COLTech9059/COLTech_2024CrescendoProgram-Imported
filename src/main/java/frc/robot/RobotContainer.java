@@ -3,14 +3,18 @@ package frc.robot;
 import frc.robot.subsystems.*;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+// import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 import frc.robot.commands.driveCommands.DriveCommand;
 import frc.robot.commands.manipulatorCommands.ArmCommand;
+import frc.robot.commands.manipulatorCommands.ShootNote;
+import frc.robot.commands.manipulatorCommands.ShuttleCommand;
 
 public class RobotContainer {
     //Subsystem declarations.
@@ -31,6 +35,9 @@ public class RobotContainer {
         // SmartDashboard.putData("Reset Position Command", new ResetPosition(m_Manipulator));
         // SmartDashboard.putData("Speaker Score Command", new SpeakerScore(m_Manipulator, eArm, aDirection, start.getDouble(2.2), end.getDouble(3)));
         // SmartDashboard.putData("Timed Turn Command", new TurnWithTimer(m_DriveTrain, tPower.getDouble(0), tTime.getDouble(0)));
+
+        JoystickButton rBumperO = new JoystickButton(IO.oController, XboxController.Button.kB.value);
+        rBumperO.onTrue(new ShuttleCommand(m_Manipulator, 0.4, 1.25));
 
         m_DriveTrain.setDefaultCommand
         (
@@ -54,8 +61,7 @@ public class RobotContainer {
                 () -> IO.oController.getLeftBumper(),
                 () -> IO.oController.getAButton(),
                 () -> IO.oController.getYButton(),
-                () -> IO.oController.getXButton(),
-                () -> IO.oController.getBButton()
+                () -> IO.oController.getXButton()
              )
         );
         //Future possible commands here.
@@ -65,7 +71,7 @@ public class RobotContainer {
 
         GenericEntry aChooser =
           Shuffleboard.getTab("Manipulator")
-          .add("Autonomous Chooser", 0)
+          .add("Autonomous Chooser", 4)
           .withPosition(0, 2)
           .getEntry();
 

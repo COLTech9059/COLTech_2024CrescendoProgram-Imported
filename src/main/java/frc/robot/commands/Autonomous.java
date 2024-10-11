@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.commands.driveCommands.MoveForwardInches;
-import frc.robot.commands.driveCommands.TurnWithTimer;
+import frc.robot.commands.driveCommands.TurnWithAngle;
 import frc.robot.commands.manipulatorCommands.EncoderSpeakerScore;
 import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -18,7 +18,7 @@ public class Autonomous extends SequentialCommandGroup
             addCommands
             (
                 new EncoderSpeakerScore(M),
-                new TurnWithTimer(dT, 0.35, 2),
+                new TurnWithAngle(dT, 0.35, 2),
                 new MoveForwardInches(dT, M, 0.35, 48.0, false)
             );
         }
@@ -38,7 +38,7 @@ public class Autonomous extends SequentialCommandGroup
             addCommands
             (
                 new EncoderSpeakerScore(M),
-                new TurnWithTimer(dT, -0.35, 1.35),
+                new TurnWithAngle(dT, -0.35, 1.35),
                 new MoveForwardInches(dT, M, 0.35, 48.0, false)
             );
         }
@@ -53,7 +53,16 @@ public class Autonomous extends SequentialCommandGroup
         {
             addCommands
             (
-            new MoveForwardInches(dT, M, 0.35, 70, true)
+                new MoveForwardInches(dT, M, 0.35, 70, false)
+            );
+        }
+        if (id == 6)
+        {
+            addCommands
+            (
+                new EncoderSpeakerScore(M),
+                new TurnWithAngle(dT, 0.5, 45),
+                new MoveForwardInches(dT, M, 0.75, 100, false)
             );
         }
     }

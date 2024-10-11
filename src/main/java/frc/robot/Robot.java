@@ -5,8 +5,10 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.robotLED;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +20,7 @@ public class Robot extends TimedRobot {
 
   private Command m_autonomousCommand;
   private RobotContainer m_RobotContainer;
+  private robotLED ledfunsies;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -27,7 +30,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_RobotContainer = new RobotContainer();
-
+    ledfunsies = new robotLED(32, 24, 0);
   }
 
   /**
@@ -88,11 +91,26 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    // ledfunsies.idleLines();
+    // ledfunsies.idleRainbow();
+    // int red = (int) (Math.random() * 256);
+    // int green = (int) (Math.random() * 256);
+    // int blue = (int) (Math.random() * 256);
+    // int[] colors = new int[]{red, green, blue};
+    // ledfunsies.setPlateRGB(colors);
+    boardTime.start();
   }
 
+  private Timer boardTime = new Timer();
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() 
+  {
+    if (boardTime.get() > 5)
+    {
+      // ledfunsies.idleLines();
+    }
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override

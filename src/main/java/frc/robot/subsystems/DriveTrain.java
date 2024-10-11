@@ -4,23 +4,23 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
 public class DriveTrain extends SubsystemBase 
 {
   /** Creates a new ExampleSubsystem. */
-
     // private Robot robot = new Robot();
-
     //create motor controller objects
     private CANSparkMax leftP = new CANSparkMax(2, MotorType.kBrushless);
     private CANSparkMax rightP = new CANSparkMax(3, MotorType.kBrushless);
@@ -64,12 +64,14 @@ public class DriveTrain extends SubsystemBase
   {
     HamsterDrive.arcadeDrive(0, 0, false);
   }
-
   Timer turnTimer = new Timer();
-
+  private double speedMult = 0.9;
   public void drive(double forwardPow, double turnPow) 
   {
-    HamsterDrive.arcadeDrive(forwardPow *.9, turnPow *-.8, false);
+    if (forwardPow > 0) speedMult = 0.75;
+    if (forwardPow < 0) speedMult = 0.9;
+    // double maximum = maxSpeed.getDouble(0.9);
+    HamsterDrive.arcadeDrive(forwardPow * speedMult, turnPow *-0.60, false);
   }
 
   @Override
@@ -90,6 +92,15 @@ public class DriveTrain extends SubsystemBase
   private GenericEntry encoderDistance =
       driveTab.add("Average Encoder Distance", avgEncoderDistance)
       .getEntry();
+
+  // GenericEntry maxSpeed =
+  //     Shuffleboard.getTab("Manipulator")
+  //     .add("Max Speed", 1)
+  //     .withPosition(1, 2)
+  //     .withSize(2, 1)
+  //     .withWidget(BuiltInWidgets.kNumberSlider)
+  //     .withProperties(Map.of("min", 0, "max", 1))
+  //     .getEntry();
 
   //#ENCODERMATH
   //This function handles all of the math and data necessary to use the encoders

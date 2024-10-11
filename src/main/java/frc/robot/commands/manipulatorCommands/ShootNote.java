@@ -4,32 +4,32 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Manipulator;
 
-public class SpeakerScore extends Command{
+public class ShootNote extends Command{
     private final Manipulator m_Manipulator;
     private final Timer moveTime = new Timer();
     private final double startTime;
     private final double endTime;
-    private final boolean enableArm;
-    private final boolean armDirection;
+    private final double targetPos;
+    private final double shootPower;
     private boolean Completed = false;
     
-    public SpeakerScore(Manipulator manip, boolean enableArm, boolean armDirection, double start, double end){
+    public ShootNote(Manipulator manip, double targetPos, double shootPower, double start, double end){
         m_Manipulator = manip;
         startTime = start;
         endTime = end;
-        this.armDirection = armDirection;
-        this.enableArm = enableArm;
+        this.targetPos = targetPos;
+        this.shootPower = shootPower;
 
         addRequirements(m_Manipulator);
     }
+
     @Override
     public void initialize(){
-        double directionMultiplier = -1;
-        if (armDirection) directionMultiplier = 1;
-        if (enableArm) m_Manipulator.moveArm(-.3 * directionMultiplier);
-        m_Manipulator.revUpFlywheel(true);
+        m_Manipulator.variablePosition(5, true, targetPos);
+        m_Manipulator.revUpFlywheel(true, shootPower);
         moveTime.start();
     }
+
     @Override
     public void execute(){
         if (moveTime.get() >= startTime)
@@ -39,7 +39,7 @@ public class SpeakerScore extends Command{
         if (moveTime.get() >= endTime)
         {
             m_Manipulator.runIntake(false, false);
-            m_Manipulator.revUpFlywheel(false);
+            m_Manipulator.revUpFlywheel(false, 0);
             Completed = true;
         }
     }
@@ -50,7 +50,7 @@ public class SpeakerScore extends Command{
     @Override
     public void end(boolean interrupted){
         Completed = false;
-        m_Manipulator.revUpFlywheel(false);
+        m_Manipulator.revUpFlywheel(false, 0);
         m_Manipulator.runIntake(false, false);
         m_Manipulator.moveArm(0.0);
 
