@@ -61,9 +61,9 @@ public class ArmCommand extends Command{
         m_Manipulator.moveArm(ArmPower.getAsDouble());
         m_Manipulator.shootNote(shootEnabled.getAsBoolean(), Constants.shootSpeed);
         m_Manipulator.ampScore(ampActive.getAsBoolean());
-        // m_Manipulator.intake(2, intakeActive.getAsBoolean());
+        m_Manipulator.intake(2, intakeActive.getAsBoolean());
         //Backup incase the optic sensor is damaged.
-        m_Manipulator.runIntake(canReverseIntake.getAsBoolean(), intakeActive.getAsBoolean());
+        // m_Manipulator.runIntake(canReverseIntake.getAsBoolean(), intakeActive.getAsBoolean());
         m_Manipulator.intakePosition(3, intakePosition.getAsBoolean());
         m_Manipulator.ampPosition(3, ampPosition.getAsBoolean());
         m_Manipulator.variablePosition(3, shootPosition.getAsBoolean(), Constants.shootPosition);

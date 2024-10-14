@@ -36,9 +36,6 @@ public class RobotContainer {
         // SmartDashboard.putData("Speaker Score Command", new SpeakerScore(m_Manipulator, eArm, aDirection, start.getDouble(2.2), end.getDouble(3)));
         // SmartDashboard.putData("Timed Turn Command", new TurnWithTimer(m_DriveTrain, tPower.getDouble(0), tTime.getDouble(0)));
 
-        JoystickButton rBumperO = new JoystickButton(IO.oController, XboxController.Button.kB.value);
-        rBumperO.onTrue(new ShuttleCommand(m_Manipulator, 0.4, 1.25));
-
         m_DriveTrain.setDefaultCommand
         (
             new DriveCommand

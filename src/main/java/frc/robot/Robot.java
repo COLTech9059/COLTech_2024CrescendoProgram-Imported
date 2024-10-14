@@ -6,8 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.manipulatorCommands.ShuttleCommand;
+import frc.robot.subsystems.Manipulator;
 import frc.robot.subsystems.robotLED;
 
 /**
@@ -21,6 +25,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_RobotContainer;
   private robotLED ledfunsies;
+  private Manipulator m_Manipulator;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -31,6 +36,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_RobotContainer = new RobotContainer();
     ledfunsies = new robotLED(32, 24, 0);
+    m_Manipulator = new Manipulator();
   }
 
   /**
@@ -80,7 +86,10 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-    }
+    }  
+
+     JoystickButton rBumperO = new JoystickButton(IO.oController, XboxController.Button.kB.value);
+      rBumperO.onTrue(new ShuttleCommand(m_Manipulator, 0.4, 5));
   }
 
   /** This function is called periodically during operator control. */

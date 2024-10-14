@@ -194,9 +194,12 @@ public class Manipulator extends SubsystemBase
         return false;
     }
 
-    private double returnAngle = Constants.shootAngle;
-    private double calculateShootAngle() 
+
+    private double returnAngle = 0;
+    private double calculateShootAngle(double armAxleToTargetWallDist) 
     {
+        // Constants.armBodyLength * Math.cos(returnAngle)
+
         // Logic has not been added yet
         return returnAngle;
     }
@@ -207,7 +210,7 @@ public class Manipulator extends SubsystemBase
     {
         finished = false;
         if (!angleCalc.getBoolean(false)) desiredAngle = Constants.shootAngle;
-        if (angleCalc.getBoolean(false)) desiredAngle = calculateShootAngle();
+        if (angleCalc.getBoolean(false)) desiredAngle = calculateShootAngle(0);
 
         if (GetArmAverage() < desiredAngle - 2) rightBaseMotor.set(0.25); 
         else if (GetArmAverage() > desiredAngle + 2) rightBaseMotor.set(-0.25); 

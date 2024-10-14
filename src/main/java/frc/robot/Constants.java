@@ -50,6 +50,13 @@ public final class Constants {
 //Manipulator Shooting Values
 public static double shootSpeed = 0.70;
 public static double supplySpeed = 0.75;
+
+//Manipulator Shoot Calculation Constants
+public static double armBodyToHeadAngle = 0;
+public static double armBodyLength = 0;
+public static double vertArmAxleToTargetDistance = 0;
+public static double targetOpeningDepth = 0;
+public static double targetOpeningHeight = 0;
  
  //LED port (PWM)
  public static int ledPort = 0;
