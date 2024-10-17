@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_RobotContainer;
   private robotLED ledfunsies;
-  private Manipulator m_Manipulator;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -36,7 +36,6 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_RobotContainer = new RobotContainer();
     ledfunsies = new robotLED(32, 24, 0);
-    m_Manipulator = new Manipulator();
   }
 
   /**
@@ -87,9 +86,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }  
-
-     JoystickButton rBumperO = new JoystickButton(IO.oController, XboxController.Button.kB.value);
-      rBumperO.onTrue(new ShuttleCommand(m_Manipulator, 0.4, 5));
   }
 
   /** This function is called periodically during operator control. */

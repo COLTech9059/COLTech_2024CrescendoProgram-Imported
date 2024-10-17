@@ -54,7 +54,6 @@ public class Manipulator extends SubsystemBase
 
     public Manipulator()
     {
-
         //Set the followerAmpMotor as a follower
         followerAmpMotor.follow(ampMotor);
 
@@ -168,8 +167,8 @@ public class Manipulator extends SubsystemBase
         {
             if (shootPosTime.get() <= timeout) 
             {
-                if (GetArmAverage() < targetPos - 1) {rightBaseMotor.set(0.25);} 
-                else if (GetArmAverage() > targetPos + 1) {rightBaseMotor.set(-0.25);} 
+                if (GetArmAverage() < targetPos - 1) {rightBaseMotor.set(0.35);} 
+                else if (GetArmAverage() > targetPos + 1) {rightBaseMotor.set(-0.35);} 
                 else
                 {
                     rightBaseMotor.set(0);
@@ -325,7 +324,7 @@ public class Manipulator extends SubsystemBase
             ampMotor.set(shootPower);
         }
         if (scoreTime.get() < 0.5 && scoreTime.get() > 0) {intakeMotor.set(0); shootOverride = false; didShoot = false;} 
-        if (scoreTime.get() >= 0.5 && scoreTime.get() < 0.75) {shootOverride = true; didShoot = false;}
+        if (scoreTime.get() >= 0.5 && scoreTime.get() < 0.75) {shootOverride = true; didShoot = false; intakeMotor.set(-0.4);}
         if (scoreTime.get() > 1.5)
         {
             shootOverride = false;
@@ -415,7 +414,7 @@ public class Manipulator extends SubsystemBase
             ampMotor.set(0.3);
         }
         if (aScoreTime.get() < 0.3 && aScoreTime.get() > 0) shootOverride = false;
-        if (aScoreTime.get() >= 0.3 && aScoreTime.get() < 0.75) shootOverride = true;
+        if (aScoreTime.get() >= 0.3 && aScoreTime.get() < 0.75) {shootOverride = true; intakeMotor.set(-0.4);}
         if (aScoreTime.get() > 0.75)
         {
             shootOverride = false;
@@ -483,13 +482,15 @@ public class Manipulator extends SubsystemBase
         * @Param isReverse     Whether or not the intake motors are reversed
         * @Param isActive      Whether or not the method does anything
         */
-    public void runIntake(boolean isReverse, boolean isActive)
+    public void runIntake(boolean isReverse, boolean isActive, boolean inUse)
     {
-        if (!isReverse && isActive) intakeMotor.set(-.4);
-        else if (isReverse && !isActive) intakeMotor.set(.2);
-        else if (shootOverride) intakeMotor.set(-0.4);
-        else if (!shootOverride) intakeMotor.set(0);
-        else intakeMotor.set(0);
+        if (inUse) {
+            if (!isReverse && isActive) intakeMotor.set(-.4);
+            else if (isReverse && !isActive) intakeMotor.set(.2);
+            else if (shootOverride) intakeMotor.set(-0.4);
+            else if (!shootOverride) intakeMotor.set(0);
+            else intakeMotor.set(0);
+        }
     }
 
     //#PECKINTAKE
@@ -561,7 +562,7 @@ public class Manipulator extends SubsystemBase
     //#HOLDMANIPULATOR
     //If the boolean "canHold" is set, runs this segment to keep the arm stable.
     public void holdManipulator(boolean Override){
-        if (Override || canHold) {rightBaseMotor.set(-0.03); setArmEncoders(Constants.shootPosition);}
+    if (Override || canHold) {rightBaseMotor.set(-0.03); /*setArmEncoders(Constants.shootPosition);*/}
     }
 
     private BooleanSupplier opticalSupplier = () -> opticalStatus;

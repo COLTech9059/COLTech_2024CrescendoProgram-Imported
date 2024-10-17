@@ -29,10 +29,10 @@ public class EncoderSpeakerScore extends Command
             if (didSPos)
             {
                 m_Manipulator.holdManipulator(true);
-                m_Manipulator.runIntake(false, true);
+                m_Manipulator.runIntake(false, true, true);
                 if (m_Manipulator.shootNote(true, Constants.shootSpeed) && !didShoot) didShoot = true;
                 if (didShoot) finished = true;
-                if (finished) m_Manipulator.runIntake(false, false);
+                if (finished) m_Manipulator.runIntake(false, false, true);
             }
         }
     }
@@ -48,7 +48,7 @@ public class EncoderSpeakerScore extends Command
     {
         finished = false;
         m_Manipulator.revUpFlywheel(false, 0);
-        m_Manipulator.runIntake(false, false);
+        m_Manipulator.runIntake(false, false, true);
         m_Manipulator.holdManipulator(false);
         m_Manipulator.resetEncoders();
     }

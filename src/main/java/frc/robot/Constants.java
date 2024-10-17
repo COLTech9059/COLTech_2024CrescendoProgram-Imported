@@ -37,19 +37,18 @@ public final class Constants {
 
  //Manipulator Encoder Values
  //Note: Encoder values are in rotations, NOT DEGREES
- //original value: -10.5
  public static double shootPosition = -7.0;
- public static double supplyPosition = -15;
+ public static double supplyPosition = -20;
  public static double ampPosition = -30.0;
  public static double drivePosition = -25.0;
- public static double startPosition = -90.0;
 
+ // Gyro angle values
  public static double shootAngle = 115;
  public static double resetAngle = 0;
 
 //Manipulator Shooting Values
 public static double shootSpeed = 0.70;
-public static double supplySpeed = 0.75;
+public static double supplySpeed = 0.85;
 
 //Manipulator Shoot Calculation Constants
 public static double armBodyToHeadAngle = 0;

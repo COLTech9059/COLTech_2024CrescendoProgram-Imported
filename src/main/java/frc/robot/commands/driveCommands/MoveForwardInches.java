@@ -43,7 +43,7 @@ public class MoveForwardInches extends Command{
     }
     @Override
     public void end(boolean interrupted){
-        manipulator.runIntake(false, false);
+        manipulator.runIntake(false, false, true);
         drivetrain.drive(0, 0);
     }
 

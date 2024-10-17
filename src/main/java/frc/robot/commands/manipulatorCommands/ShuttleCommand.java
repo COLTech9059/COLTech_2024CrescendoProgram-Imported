@@ -10,21 +10,25 @@ public class ShuttleCommand extends Command{
     private Manipulator sentManip;
     private double startTime;
     private double endTime;
+    private boolean finished = false;
+    
     public ShuttleCommand(Manipulator sentManip, double startTime, double endTime)
     {
         this.sentManip = sentManip;
         this.startTime = startTime;
         this.endTime = endTime;
+
+        addRequirements(sentManip);
     }
 
     private Timer shuttleTime = new Timer();
-    private boolean finished = false;
     @Override
     public void initialize()
     {
         shuttleTime.reset();
         shuttleTime.start();
         new ShootNote(sentManip, Constants.supplyPosition, Constants.supplySpeed, startTime, endTime);
+        finished = false;
     }
 
     @Override

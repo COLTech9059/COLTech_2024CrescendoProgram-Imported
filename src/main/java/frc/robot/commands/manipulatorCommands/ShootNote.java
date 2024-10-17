@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Manipulator;
 
-public class ShootNote extends Command{
+public class ShootNote extends Command {
     private final Manipulator m_Manipulator;
     private final Timer moveTime = new Timer();
     private final double startTime;
@@ -25,20 +25,19 @@ public class ShootNote extends Command{
 
     @Override
     public void initialize(){
-        m_Manipulator.variablePosition(5, true, targetPos);
         m_Manipulator.revUpFlywheel(true, shootPower);
         moveTime.start();
     }
 
     @Override
     public void execute(){
-        if (moveTime.get() >= startTime)
+        if (m_Manipulator.variablePosition(5, true, targetPos))
         {
-            m_Manipulator.runIntake(false, true);
+            if (moveTime.get() > startTime) m_Manipulator.runIntake(false, true, true);
         }
         if (moveTime.get() >= endTime)
         {
-            m_Manipulator.runIntake(false, false);
+            m_Manipulator.runIntake(false, false, true);
             m_Manipulator.revUpFlywheel(false, 0);
             Completed = true;
         }
@@ -51,7 +50,7 @@ public class ShootNote extends Command{
     public void end(boolean interrupted){
         Completed = false;
         m_Manipulator.revUpFlywheel(false, 0);
-        m_Manipulator.runIntake(false, false);
+        m_Manipulator.runIntake(false, false, true);
         m_Manipulator.moveArm(0.0);
 
         moveTime.stop();
