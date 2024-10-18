@@ -7,11 +7,15 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.IO;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -177,6 +181,7 @@ public class Manipulator extends SubsystemBase
                     //Reset timers.
                     shootPosTime.stop();
                     shootPosTime.reset();
+                    rumbleController(IO.oController, RumbleType.kBothRumble, 0.5, 1);
                     return true;
                     // led.setBoard("green");
                 }
@@ -191,6 +196,13 @@ public class Manipulator extends SubsystemBase
             }
         }
         return false;
+    }
+
+    public void rumbleController(XboxController control, RumbleType type, double strength, double duration)
+    {
+        control.setRumble(type, strength);
+        new WaitCommand(duration);
+        control.setRumble(type, 0);
     }
 
 
